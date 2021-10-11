@@ -1,6 +1,7 @@
 const csv = require("csv-parser");
 const fs = require("fs");
 const results = [];
+const customersAllergiesList = [];
 const baseIngredientList = [];
 const foodIngredients = [];
 const parsFood = {};
@@ -15,13 +16,19 @@ rl.question("Write who buys what? ", function (answer) {
   var customer = answer.split(", ")[0];
   var order = answer.split(", ")[1];
 
+  function capitalize(order) {
+    return order.charAt(0).toUpperCase() + order.slice(1);
+  }
+  
+  const capitalizeFoodName = order.split(" ").map(capitalize).join(" ");
+
   fs.createReadStream("RegularCustomersAllergies.csv")
     .pipe(csv())
-    .on("data", (data) => results.push(data))
+    .on("data", (data) => customersAllergiesList.push(data))
     .on("end", () => {
-      let obj = results.find((o) => o.name === customer);
-      var customerAllergieProduct = obj.product.split(", ");
-
+      const customerAndAlergi = customersAllergiesList.find((o) => o.name === customer);
+      // console.log(customerAndAlergi)
+      const customerAllergieProduct = customerAndAlergi.product.split(", ");
       fs.createReadStream("BaseIngredientList.csv")
         .pipe(csv())
         .on("data", (data) => baseIngredientList.push(data))
@@ -30,7 +37,7 @@ rl.question("Write who buys what? ", function (answer) {
             return order.charAt(0).toUpperCase() + order.slice(1);
           }
           const capitalizeFoodName = order.split(" ").map(capitalize).join(" ");
-          var baseIngredients = baseIngredientList[0].ingredients.split(",");
+          const baseIngredients = baseIngredientList[0].ingredients.split(",");
 
           fs.createReadStream("FoodIngredients.csv")
             .pipe(csv())
@@ -50,14 +57,15 @@ rl.question("Write who buys what? ", function (answer) {
                   })
                   .join("" + ", ");
               };
-              const result = getBaseIngridients(capitalizeFoodName).split(", ");
-              uniqueArray = result.filter(function (item, pos) {
-                return result.indexOf(item) == pos;
+              
+              const baseIngridients = getBaseIngridients(capitalizeFoodName).split(", ")
+              const baseIngridientsList = baseIngridients.filter(function (item, pos) {
+                return baseIngridients.indexOf(item) == pos;
               });
-              console.log(uniqueArray);
-              const checkAlergiExist = (result, capitalizeFoodName, customerAllergieProduct) => {
+              // console.log(baseIngridientsList);
+              const checkAlergiExist = (baseIngridients, capitalizeFoodName, customerAllergieProduct) => {
                 for (i = 0; i <= customerAllergieProduct.length; i++) {
-                  if (result.indexOf(customerAllergieProduct[i]) !== -1) {
+                  if (baseIngridients.indexOf(customerAllergieProduct[i]) !== -1) {
                     console.log(customer +  " - " + capitalizeFoodName + ": " + "can’t order, allergic to: " + customerAllergieProduct);
                     break;
                   } else {
@@ -66,26 +74,9 @@ rl.question("Write who buys what? ", function (answer) {
                   }
                 }
               };
-              checkAlergiExist(result, capitalizeFoodName, customerAllergieProduct);
+              checkAlergiExist(baseIngridients, capitalizeFoodName, customerAllergieProduct);
             });
         });
     });
   rl.close();
 });
-
-
-// fs.createReadStream("BaseIngridientsPrice.csv")
-//     .pipe(csv())
-//     .on("data", (data) => foodPrice.push(data))
-//     .on("end", () => {
-
-//     //   let obj = foodPrice.find((o) => o.name === customer);
-//     //   var customerAllergieProduct = obj.product.split(", ");
-
-//       for (element in foodPrice) {
-//         parsPrice[foodPrice[element].ingredients] =
-//         foodPrice[element].price;
-//       }
-//       console.log(parsPrice)
-
-//     })
