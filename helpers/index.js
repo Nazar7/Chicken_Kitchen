@@ -2,6 +2,24 @@ const getCustomerAllergieProduct = (data, customer) => {
   return data.find((o) => o.name === customer).product.split(", ");
 };
 
+const getBaseIngredientsPrices = (data) => {
+    let parsPrice = {};
+  for (element in data) {
+    parsPrice[data[element].ingredients] =
+    data[element].price.split(", ");
+  }
+  return parsPrice;
+  };
+  
+  const getCustomerBudget = (data) => {
+    let parsBudget = {};
+  for (element in data) {
+    parsBudget[data[element].customer] =
+    data[element].budget.split(", ");
+  }
+  return parsBudget;
+  };
+
 const getFoodIngredients = (foodIngredients) => {
   let parsFood = {};
   for (element in foodIngredients) {
@@ -20,8 +38,13 @@ function getCapitalize(order) {
   return capitalizeFoodName;
 }
 
+
+
+
 module.exports = {
   getCustomerAllergieProduct,
   getFoodIngredients,
   getCapitalize,
+  getBaseIngredientsPrices,
+  getCustomerBudget,
 };
