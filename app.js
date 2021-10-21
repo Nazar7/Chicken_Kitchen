@@ -2,7 +2,6 @@ const readline = require("readline");
 const fs = require("fs");
 
 const { getDataFromFile } = require("./services/index.js");
-const { getDataFromFileTxt } = require("./services/indexTXT")
 
 const {
   getCustomerAllergieProduct,
@@ -23,20 +22,16 @@ const {
 
 // Julie Mirage, Fish in water
 
-// const rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout,
-// });
-
-
-// rl.question("Write who buys what? ", async function (answer) {
   fs.readFile("./data/OrderFile.txt", 'utf8', async function (err, data) {
 
+console.log(data)
+
     var ordersList = data.split(/\r\n/);
+    console.log(ordersList)
     let parsOrders = [];
     for (let i = 0; i < ordersList.length; i++ ){
       let [action, name, order] = ordersList[i].split(', ');
-      if (action === 'Buy' && parsOrders.length == 3) {
+      if (action === 'Buy' && name !== "" && order !=="") {
       parsOrders.push({ name, order });
       }
       }
@@ -49,9 +44,9 @@ const {
   var capitalize = getCapitalize(parsOrders[i].order);
 
   var orderr = capitalize;
-console.log(orderr)
+    console.log(orderr)
   var customer = parsOrders[i].name
-  console.log(customer)
+    console.log(customer)
 
 
   const customerAllergieProduct = getCustomerAllergieProduct(
@@ -107,32 +102,10 @@ console.log(orderr)
     getOrderPrice(orderIngridients, baseIngredientsPrices);
   console.log(restOfBudget + " - rest of budget");
 
-  // function getMoreFood(restOfBudget) {
-  //   rl.question("Would you like to order something else? ", async function (line) {
-  //     if (line == "no") {
-  //       rl.close();
-  //     } else {
-  //       capitalize = getCapitalize(line);
-  //       orderr = capitalize;
-  //       checkAlergiExist(orderIngridients, capitalize, customerAllergieProduct, customer);
-  //       var price = getOrderPrice(orderIngridients, baseIngredientsPrices)
-  //       restOfBudget = restOfBudget - price;
-  //       if (restOfBudget >= 0) {
-  //         getMoreFood(restOfBudget);
-  //       } else {
-  //         console.log(customer + " – can’t order, budget " +  (restOfBudget + price) + " and " + orderr + " costs " +  price + " .")
-  //         rl.close()
-  //       }
-  //     }
-  //   });
-  // }
-  // getMoreFood(restOfBudget);
+ 
 }
-var stream = fs.createWriteStream("./data/OrderResultFile.txt");
-stream.once('open', function(result) {
-  stream.write(checkAlergiExist(orderIngridients, capitalize, customerAllergieProduct, customer));
-  stream.end();
-});
+
+
 
 });
 
