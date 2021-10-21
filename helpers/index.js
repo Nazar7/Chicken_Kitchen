@@ -15,7 +15,7 @@ const getBaseIngredientsPrices = (data) => {
   return parsPrice;
   };
   
-  const getCustomerBudget = (data) => {
+  const getCustomersBudgets = (data) => {
     let parsBudget = {};
   for (element in data) {
     parsBudget[data[element].customer] =
@@ -55,14 +55,20 @@ const getBaseIngridientsOfOrder = (orderr, foodIngredientsListt, baseIngredientL
 };
 
 const checkAlergiExist = (result, capitalize, customerAllergieProduct, customer) => {
+  let data = ''
+  let seccess = true;
   for (i = 0; i <= customerAllergieProduct.length; i++) {
     if (result.indexOf(customerAllergieProduct[i]) !== -1) {
-      console.log(customer + " - " + capitalize + ": " + "can’t order, allergic to: " + customerAllergieProduct); 
-      break;
+      seccess = false;
+      // data = customer + " - " + capitalize + ": " + "can’t order, allergic to: " + customerAllergieProduct;
+      data = "can’t buy, allergic to " + customerAllergieProduct;
+      if(!seccess) return data;
+      
     } else {
-      console.log(customer + " - " + capitalize + ": " + "succes");
-      // console.log(customerAllergieProduct)
-      break;
+      seccess = true;
+      // data = customer + " - " + capitalize + ": " + "success";
+      data = "seccess"
+      if(seccess) return data    
     }
   }
 };
@@ -98,7 +104,7 @@ module.exports = {
   getFoodIngredients,
   getCapitalize,
   getBaseIngredientsPrices,
-  getCustomerBudget,
+  getCustomersBudgets,
   checkAlergiExist,
   getOrderPrice,
   getBudget,
