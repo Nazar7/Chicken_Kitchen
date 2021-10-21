@@ -1,3 +1,7 @@
+const getOrderDataFromTxt = (data) => {
+  console.log(data)
+}
+
 const getCustomerAllergieProduct = (data, customer) => {
   return data.find((o) => o.name === customer).product.split(", ");
 };
@@ -39,7 +43,7 @@ function getCapitalize(order) {
 }
 
 const getBaseIngridientsOfOrder = (orderr, foodIngredientsListt, baseIngredientListt) => {
-  let parsFood = foodIngredientsListt;
+  let parsFood = foodIngredientsListt; 
   return parsFood[orderr]
     .map((item) => {
       if (baseIngredientListt.includes(item)) {
@@ -99,4 +103,5 @@ module.exports = {
   getOrderPrice,
   getBudget,
   getBaseIngridientsOfOrder,
+  getOrderDataFromTxt
 };
