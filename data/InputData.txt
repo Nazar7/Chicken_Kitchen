@@ -1,3 +1,4 @@
-Restaurant budget: 500
-Buy, Alexandra Smith, Princess Chicken
-Buy, Barbara Smith, Tuna Cake
+Budget, =, 300
+Buy, Julie Mirage, Princess Chicken
+Buy, Elon Carousel, Tuna Cake
+Order, Tuna, 5

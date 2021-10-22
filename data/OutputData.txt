@@ -1,4 +1,4 @@
-Restaurant budget: 500
-Buy, Alexandra Smith, Princess Chicken -> Alexandra, 500, Princess Chicken, 90 -> seccess
-Buy, Barbara Smith, Tuna Cake -> Barbara, 250, Tuna Cake, XXX -> can’t buy, allergic to Chocolate
-Restaurant budget: 617
+Restaurant budget: 300
+Buy, Julie Mirage, Princess Chicken -> Julie, 100, Princess Chicken, 90 -> seccess
+Buy, Elon Carousel, Tuna Cake -> Elon, 50, Tuna Cake, XXX -> NOT INAF MONEY
+Restaurant budget: 417

@@ -64,19 +64,19 @@ const getBaseIngridientsOfOrder = (orderr, foodIngredientsListt, baseIngredientL
 
 const checkAllergiExist = (result, capitalize, customerAllergieProduct, customer) => {
   let data = ''
-  let seccess = true;
+  let exist = false;
   for (i = 0; i <= customerAllergieProduct.length; i++) {
     if (result.indexOf(customerAllergieProduct[i]) !== -1) {
-      seccess = false;
+      exist = true;
       // data = customer + " - " + capitalize + ": " + "can’t order, allergic to: " + customerAllergieProduct;
       data = "can’t buy, allergic to " + customerAllergieProduct;
-      if(!seccess) return data;
+      if(exist) return data;
       
     } else {
-      seccess = true;
+      exist = false;
       // data = customer + " - " + capitalize + ": " + "success";
       data = "seccess"
-      if(seccess) return data    
+      if(!exist) return data    
     }
   }
 };
