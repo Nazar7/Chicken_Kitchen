@@ -9,35 +9,42 @@ const {
   getCapitalize,
   getBaseIngredientsPrices,
   getCustomersBudgets,
-  checkAlergiExist,
+  checkAllergiExist,
   getOrderPrice,
-  getBudget,
+  getCustomerBudget,
   getBaseIngridientsOfOrder,
+  getRestaurantBudget,
 } = require("./helpers/index.js");
 
 
 // Julie Mirage, Fish in water
 
-fs.readFile("./data/OrderFile.txt", "utf8", async function (err, data) {
-  console.log(data);
+
+
+fs.readFile("./data/InputData.txt", "utf8", async function (err, data) {
 
   var ordersList = data.split(/\r\n/);
-  console.log(ordersList);
+
+  let restaurantBudget = getRestaurantBudget(data).split(": ")[1]
+  var resultData = [];
+  resultData.push(getRestaurantBudget(data))
+
   let parsOrders = [];
-  for (let i = 0; i < ordersList.length; i++) {
+  for (let i = 1; i < ordersList.length; i++) {
     let [action, name, order] = ordersList[i].split(", ");
     if (action === "Buy" && name !== "" && order !== "") {
       parsOrders.push({ name, order });
     }
   }
 
-  // const [customer, order] = answer.split(", ");
-  var resultData = [];
+  
   for (let i = 0; i < parsOrders.length; i++) {
     var capitalize = getCapitalize(parsOrders[i].order);
     var orderr = capitalize;
     console.log(orderr);
-    var customer = parsOrders[i].name;
+    var customer = parsOrders[i].name
+    var customerName = parsOrders[i].name.split(' ')[0];
+    var customerLastName = parsOrders[i].name.split(' ')[1];
     console.log(customer);
 
     const customerAllergieProduct = getCustomerAllergieProduct(
@@ -83,25 +90,38 @@ fs.readFile("./data/OrderFile.txt", "utf8", async function (err, data) {
       return orderIngridients.indexOf(item) == pos;
     });
 
-    // console.log(orderIngridients)
+    var restOfCustomerBudget =
+      getCustomerBudget(customer, customersBudgets) -
+      getOrderPrice(orderIngridients, baseIngredientsPrices) * 1.3;
 
-    checkAlergiExist(
-      orderIngridients,
-      capitalize,
-      customerAllergieProduct,
-      customer
-    );
+    const orderPrice = () =>{
+      if(checkAllergiExist(orderIngridients, capitalize, customerAllergieProduct, customer) !== 'seccess'){
+          return "XXX"
+      } else {
+        return getOrderPrice(orderIngridients, baseIngredientsPrices)
+      }
+    }
 
-    var restOfBudget =
-      getBudget(customer, customersBudgets) -
-      getOrderPrice(orderIngridients, baseIngredientsPrices);
-    console.log(restOfBudget + " - rest of budget");
-
-    resultData.push(ordersList[i] + " -> " + customer.split(" ")[0] + ", " + getBudget(customer, customersBudgets) + ", " + orderr + ", " +
-         getOrderPrice(orderIngridients, baseIngredientsPrices) +  " -> " + checkAlergiExist(orderIngridients, capitalize, customerAllergieProduct, customer));
+    let resultOfOrder = ordersList[i+1] + " -> " + customerName + ", " + getCustomerBudget(customer, customersBudgets) + ", " + orderr + ", " +
+    orderPrice() +  " -> " + checkAllergiExist(orderIngridients, capitalize, customerAllergieProduct, customer)
+    
+    const getRestaurantProfit = () =>{
+    if(checkAllergiExist(orderIngridients, capitalize, customerAllergieProduct, customer) == 'seccess') {
+      restaurantBudget = parseInt(restaurantBudget) +  parseInt(getOrderPrice(orderIngridients, baseIngredientsPrices) * 1.3)
+    }
+    return restaurantBudget
   }
-  console.log(resultData.join("\n"));
-  fs.writeFile("./data/OrderResultFile.txt", resultData.join("\n"), (err) => {
+
+  var newBudget = getRestaurantProfit()
+   
+    if (restOfCustomerBudget > 0) resultData.push(resultOfOrder);
+
+  } 
+
+  resultData.push("Restaurant budget: " + newBudget)
+
+  
+  fs.writeFile("./data/OutputData.txt", resultData.join("\n"), (err) => {
     if (err) console.log(err);
   });
 });

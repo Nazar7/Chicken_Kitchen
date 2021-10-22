@@ -1,8 +1,16 @@
+const getRestaurantBudget = (data) => {
+  return data.split(`\n`)[0]
+  // return data.split(`\n`)[0].split(": ")[1];
+  };
+
+
 const getOrderDataFromTxt = (data) => {
-  console.log(data)
+  return data
 }
 
 const getCustomerAllergieProduct = (data, customer) => {
+  // console.log(data)
+  // console.log(customer)
   return data.find((o) => o.name === customer).product.split(", ");
 };
 
@@ -54,7 +62,7 @@ const getBaseIngridientsOfOrder = (orderr, foodIngredientsListt, baseIngredientL
     .join("" + ", ");
 };
 
-const checkAlergiExist = (result, capitalize, customerAllergieProduct, customer) => {
+const checkAllergiExist = (result, capitalize, customerAllergieProduct, customer) => {
   let data = ''
   let seccess = true;
   for (i = 0; i <= customerAllergieProduct.length; i++) {
@@ -87,7 +95,7 @@ const getOrderPrice = (orderIngridients, baseIngredientsPrices) =>{
     return totalOrderPrice;
 }
 
-const getBudget = (customer, customerBudget) =>{
+const getCustomerBudget = (customer, customerBudget) =>{
   let totalBudget = null;
       for (const [key, value] of Object.entries(customerBudget)) {
           if(key === customer){
@@ -105,9 +113,10 @@ module.exports = {
   getCapitalize,
   getBaseIngredientsPrices,
   getCustomersBudgets,
-  checkAlergiExist,
+  checkAllergiExist,
   getOrderPrice,
-  getBudget,
+  getCustomerBudget,
   getBaseIngridientsOfOrder,
-  getOrderDataFromTxt
+  getOrderDataFromTxt,
+  getRestaurantBudget
 };
