@@ -1,4 +1,5 @@
-Budget, =, 300
-Buy, Julie Mirage, Princess Chicken
+Budget, =, 100
+Buy, Adam Smith, Fries
+Order, Tuna, 1
 Buy, Elon Carousel, Tuna Cake
-Order, Tuna, 5
+Budget, =, 1000

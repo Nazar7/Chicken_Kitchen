@@ -4,8 +4,27 @@ const fs = require("fs");
 const { getDataFromFile } = require("./services/index.js");
 
 const {
-  getCustomerAllergieProduct,
-  getFoodIngredients,
+  getBaseIngredientsList,
+    getFoodIngredientsList,
+    getCustomerAllergieProductsList,
+    getBaseIngredientsPricesList,
+    getCustomersBudgetsList,
+} = require("./helpers/getData")
+
+const {
+  getBuyAction,
+  getOrderAction,
+  getBudgetAction,
+  compareRestaurentBudget,
+  } = require("./helpers/actionFunctions.js")
+
+  // const {
+  //   customerAllergieProduct,
+  // baseIngredientListt
+  // } = require("./helpers/getParsedData.js")
+
+const {
+  getBaseIngredients,
   getCapitalize,
   getBaseIngredientsPrices,
   getCustomersBudgets,
@@ -13,136 +32,199 @@ const {
   getOrderPrice,
   getCustomerBudget,
   getBaseIngridientsOfOrder,
+  getParseInputData,
+  getFoodIngredients
 } = require("./helpers/index.js");
+
+const {
+  sendReadedData
+} = require("./services/dataFromFile.js")
 
 // Julie Mirage, Fish in water
 
-fs.readFile("./data/InputData.txt", "utf8", async function (err, data) {
-  var ordersList = data.split(/\r\n/);
+// fs.readFile("./data/InputData.txt", "utf8", async function (err, data) {
 
+const res = async (sendReadedData) => {
+  const ordersList = await sendReadedData()
+  // console.log(ordersList)
+  const parsedInputData = getParseInputData(ordersList)
+
+  // console.log(parsedInputData)
+
+  let restaurantBudget = 500;
   var resultData = [];
-
-  let parsBuyers = [];
-  let parsBudget = [];
-  let parsOrder = [];
-  for (let i = 0; i < ordersList.length; i++) {
-    let [action, arg, val] = ordersList[i].split(", ");
-    if (action === "Buy" && arg !== "" && val !== "") {
-      parsBuyers.push({ action, arg, val });
-    } else if (action === "Budget") {
-      parsBudget.push({ action, arg, val });
-    } else if (action === "Order") {
-      parsOrder.push({ action, arg, val });
-    }
-  }
-
-  var order = parsOrder[0].arg
-  var quantity = parsOrder[0].val
-  console.log(order)
-  console.log(quantity)
-  let restaurantBudget = parsBudget[0].val;
-  // console.log(restaurantBudget)
   resultData.push("Restaurant budget: " + restaurantBudget);
+  let newRestaurantBudget = 0; 
+  for (let i = 0; i <= parsedInputData.length-1; i++) {
+    let customer = "";
+    let orderr = "";
+    let resturanOrderProduct = "";
+    let resturanOrderQuantity = "";
+    let data = parsedInputData[i]
+    // let obj = parsedInputData[i]
 
-  for (let i = 0; i < parsBuyers.length; i++) {
-    var capitalize = getCapitalize(parsBuyers[i].val);
-    var orderr = capitalize;
-    console.log(orderr);
-    var customer = parsBuyers[i].arg;
-    var customerName = parsBuyers[i].arg.split(" ")[0];
-    var customerLastName = parsBuyers[i].arg.split(" ")[1];
-    console.log(customer);
+   
+    const foodIngredients = await getFoodIngredientsList()
 
-    const customerAllergieProduct = getCustomerAllergieProduct(
-      await getDataFromFile("./data/RegularCustomersAllergies.csv"),
-      customer
-    );
+    const baseIngredients = await getBaseIngredientsList()
 
-    // console.log(customerAllergieProduct)
+    const customerAllergieProducts = await getCustomerAllergieProductsList(customer)
 
-    const baseIngredientListt = await getDataFromFile(
-      "./data/BaseIngredientList.csv"
-    ).then((data) => {
-      return data[0].ingredients.split(",");
-    });
+    const ingredientsPrices = await getBaseIngredientsPricesList()
+
+    const customersBudgets = await getCustomersBudgetsList()
+
+
+    if(parsedInputData[i].action === 'Budget' && parsedInputData[i].arg === "="){
+      newRestaurantBudget = getBudgetAction(data)
+      console.log(newRestaurantBudget)
+      resultData.push(newRestaurantBudget)
+      // restaurantBudget = parseInt(parsedInputData[i].val)
+    } else if (parsedInputData[i].action === 'Budget' && parsedInputData[i].arg === "+") {
+      newRestaurantBudget = getBudgetAction(data)
+      console.log(newRestaurantBudget)
+      resultData.push(newRestaurantBudget)
+      // restaurantBudget += parseInt(parsedInputData[i].val)
+    } else if (parsedInputData[i].action === 'Budget' && parsedInputData[i].arg === "-") {
+      newRestaurantBudget = getBudgetAction(data)
+      console.log(newRestaurantBudget)
+      resultData.push(newRestaurantBudget)
+      // restaurantBudget -= parseInt(parsedInputData[i].val)
+    } else if (parsedInputData[i].action === 'Buy' || parsedInputData[i].action === 'Table') {
+      // console.log("URAAAAAAAAAAAAAAAAAAAAA")
+      // console.log(data)
+      // console.log(i)
+      const res = getBuyAction(
+        data,
+        i,
+        orderr,
+        getFoodIngredients,
+        foodIngredients,
+        baseIngredients,
+        customersBudgets,
+        ingredientsPrices,
+        customerAllergieProducts,
+        getBaseIngridientsOfOrder,
+        newRestaurantBudget
+        )
+        console.log(res)
+      // customer = parsedInputData[i].arg;
+      // customerName = customer.split(', ')[0];
+      // orderr = parsedInputData[i].val;
+    } else if (parsedInputData[i].action === 'Order') {
+      // resturanOrderProduct = parsedInputData[i].arg;
+      // resturanOrderQuantity = parsedInputData[i].val;
+    } 
+
+   
+
+    // const customerAllergieProduct = getCustomerAllergieProduct(
+    //   await getDataFromFile("./data/RegularCustomersAllergies.csv"),
+    //   customer
+    // );
+
+  
+    // const baseIngredientListt = await getDataFromFile(
+    //   "./data/BaseIngredientList.csv"
+    // ).then((data) => {
+    //   return data[0].ingredients.split(",");
+    // });
+
+  
 
     // console.log(baseIngredientListt)
 
-    const foodIngredientsListt = getFoodIngredients(
-      await getDataFromFile("./data/FoodIngredients.csv"),
-      customer
-    );
+    // const foodIngredientsListt = await getFoodIngredients(
+    //   await getDataFromFile("./data/FoodIngredients.csv"),
+    //   customer
+    // );
 
     // console.log(foodIngredientsListt)
 
-    const baseIngredientsPrices = getBaseIngredientsPrices(
-      await getDataFromFile("./data/BaseIngridientsPrice.csv")
-    );
+    // const baseIngredientsPrices = getBaseIngredientsPrices(
+    //   await getDataFromFile("./data/BaseIngridientsPrice.csv")
+    // );
 
-    console.log(baseIngredientsPrices)
+    // console.log(baseIngredientsPrices)
 
-    const customersBudgets = getCustomersBudgets(
-      await getDataFromFile("./data/RegularCustomerBudget.csv")
-    );
+    // const customersBudgets = getCustomersBudgets(
+    //   await getDataFromFile("./data/RegularCustomerBudget.csv")
+    // );
 
     // console.log(customerBudget)
 
-    const orderIngridients = getBaseIngridientsOfOrder(
-      orderr,
-      foodIngredientsListt,
-      baseIngredientListt
-    ).split(", ");
+  
+    // console.log(foodIngredientsListt)
+    // console.log(baseIngredientListt)
+    // let data = parsedInputData[i]
+    // console.log(data)
+  //  console.log(resultData)
 
-    ingridientsOfOrder = orderIngridients.filter(function (item, pos) {
-      return orderIngridients.indexOf(item) == pos;
-    });
+console.log("_______________________________________________________")
+// console.log(resultData)
+// console.log(i)
+// console.log(resultData.includes("RESTAURANT BANKRUPT"))
+// let q = resultData.split(",")
+// console.log(resultData)
+// console.log(i)
+// console.log(resultData[i])
+// console.log(resultData[i].includes("RESTAURANT BANKRUPT"))
 
-    var restOfCustomerBudget =
-      getCustomerBudget(customer, customersBudgets) -
-      getOrderPrice(orderIngridients, baseIngredientsPrices) * 1.3;
 
-    const alergiExist = checkAllergiExist(
-      orderIngridients,
-      capitalize,
-      customerAllergieProduct,
-      customer
-    );
 
-    const customerBudget = getCustomerBudget(customer, customersBudgets);
 
-    const orderPrice = parseInt(
-      getOrderPrice(orderIngridients, baseIngredientsPrices)
-    );
 
-    const res = () => {
-      if (customerBudget > orderPrice) {
-        var resultOfOrder = ordersList[i + 1] + " -> " + customerName + ", " + customerBudget + ", " + orderr + ", " + orderPrice + " -> " + alergiExist;
-        return resultData.push(resultOfOrder);
-      } else if (customerBudget < orderPrice) {
-        var resultOfOrder = ordersList[i + 1] + " -> " + customerName + ", " + customerBudget + ", " + orderr + ", " + "XXX" + " -> " + "NOT INAF MONEY";
-        return resultData.push(resultOfOrder);
-      }
-      return;
-    };
+// if((parsedInputData[i].action === "Buy" || parsedInputData[i].action === "Table") && newRestaurantBudget > 0 ){
+//   // console.log(i)
+//   // console.log(resultData)
+//   let r = getBuyAction( 
+//     data,
+//     i,    
+//     customer,
+//     foodIngredientsListt,
+//     baseIngredientListt,
+//     customersBudgets,
+//     baseIngredientsPrices,
+//     customerAllergieProduct,
+//     getBaseIngridientsOfOrder,
+//     )
+//     console.log(r[1] + "111111111111111111111111111111111")
+//     console.log(r)
+//     // newRestaurantBudget += parseInt(r[1])
+//     // console.log(r[0])
+//     resultData.push(r[0])
+  
+//   // resultData.push(getBuyAction( 
+//   //   data,
+//   //   i,    
+//   //   customer,
+//   //   foodIngredientsListt,
+//   //   baseIngredientListt,
+//   //   customersBudgets,
+//   //   baseIngredientsPrices,
+//   //   customerAllergieProduct,
+//   //   getBaseIngridientsOfOrder,
+//   //   )
+//   // )
+// }else if (parsedInputData[i].action === "Budget" ) {
+//   newRestaurantBudget += parseInt(restaurantBudget);
+//   resultData.push("Restaurant budget: " + newRestaurantBudget);
+// } else if (parsedInputData[i].action === "Order" ) {
+//   let bankruptEvent = getOrderAction(data, baseIngredientsPrices, newRestaurantBudget)
+//   newRestaurantBudget = parseInt(bankruptEvent[1])
+//   resultData.push(bankruptEvent)
+// }else if(resultData[i] === "RESTAURANT BANKRUPT"){
 
-    res();
+// }
 
-    var getRestaurantProfit = () => {
-      console.log(customerBudget)
-      console.log(orderPrice)
-      console.log(restaurantBudget)
-      if (alergiExist == "seccess" && customerBudget > orderPrice) {
-        return (restaurantBudget = parseInt(restaurantBudget) + orderPrice * 1.3 );
-      } else {
-        return (restaurantBudget = parseInt(restaurantBudget))
-      }
-    };
-    var newBudget = getRestaurantProfit();
+  
   }
 
-  resultData.push("Restaurant budget: " + newBudget);
+  // resultData.push("Restaurant budget: " + newBudget);
 
   fs.writeFile("./data/OutputData.txt", resultData.join("\n"), (err) => {
     if (err) console.log(err);
   });
-});
+}
+res(sendReadedData)
+// });

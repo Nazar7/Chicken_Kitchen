@@ -1,6 +1,16 @@
+const getParseInputData = (ordersList) => {
+ let parsInputData = [];
+ for (let i = 0; i <= ordersList.length-1; i++) {
+   let [action, arg, val] = ordersList[i].split(", ");
+   if (action !== ""  && arg !== "" && val !== "" && ordersList[i].length >= 3) {
+     parsInputData.push({ action, arg, val });
+   } else i++
+ }
+ return parsInputData
+}
+
 const getRestaurantBudget = (data) => {
   return data.split(`\n`)[0]
-  // return data.split(`\n`)[0].split(": ")[1];
   };
 
 
@@ -8,10 +18,10 @@ const getOrderDataFromTxt = (data) => {
   return data
 }
 
-const getCustomerAllergieProduct = (data, customer) => {
-  // console.log(data)
-  // console.log(customer)
-  return data.find((o) => o.name === customer).product.split(", ");
+
+const getCustomerAllergieProduct = (data, customer) => { 
+  if(customer !== "") return data.find((o) => o.name === customer).product.split(", ");
+
 };
 
 const getBaseIngredientsPrices = (data) => {
@@ -38,8 +48,11 @@ const getFoodIngredients = (foodIngredients) => {
     parsFood[foodIngredients[element].food] =
       foodIngredients[element].ingredients.split(", ");
   }
+  console.log(parsFood)
   return parsFood;
 };
+
+
 
 function getCapitalize(order) {
   const capitalizeFoodName = order
@@ -50,17 +63,22 @@ function getCapitalize(order) {
   return capitalizeFoodName;
 }
 
-const getBaseIngridientsOfOrder = (orderr, foodIngredientsListt, baseIngredientListt) => {
-  let parsFood = foodIngredientsListt; 
-  return parsFood[orderr]
+const getBaseIngridientsOfOrder = (order, foodIngredients, baseIngredients) => {
+  let parsFood = {};
+  for (element in foodIngredients) {
+    parsFood[foodIngredients[element].food] =
+      foodIngredients[element].ingredients.split(", ");
+  }
+  return parsFood[order]
     .map((item) => {
-      if (baseIngredientListt.includes(item)) {
+      if (baseIngredients.includes(item)) {
         return item;
       }
-      return getBaseIngridientsOfOrder(item, foodIngredientsListt, baseIngredientListt);
+      return getBaseIngridientsOfOrder(item, foodIngredients, baseIngredients);
     })
     .join("" + ", ");
-};
+}
+
 
 const checkAllergiExist = (result, capitalize, customerAllergieProduct, customer) => {
   let data = ''
@@ -82,16 +100,22 @@ const checkAllergiExist = (result, capitalize, customerAllergieProduct, customer
 };
 
 
-const getOrderPrice = (orderIngridients, baseIngredientsPrices) =>{
+const getOrderPrice = (orderIngridients, ingredientsPrices) =>{
+  console.log("00000000000000000000000000000000000000000000000000000000000")
+  console.log(orderIngridients)
+  console.log("00000000000000000000000000000000000000000000000000000000000")
+  console.log(ingredientsPrices)
+  // console.log(orderIngridients + "============================")
   let totalOrderPrice = null;
     for (let i = 0;  i < orderIngridients.length; i++){
-      for (const [key, value] of Object.entries(baseIngredientsPrices)) {
+      for (const [key, value] of Object.entries(ingredientsPrices)) {
           if(key === orderIngridients[i]){
             totalOrderPrice += parseInt(value)
           }
       }
     }
-    console.log(totalOrderPrice + " - total price of food")
+    // console.log(totalOrderPrice + " - total price of food")
+    console.log(totalOrderPrice)
     return totalOrderPrice;
 }
 
@@ -102,7 +126,7 @@ const getCustomerBudget = (customer, customerBudget) =>{
             totalBudget = parseInt(value)
           }
       }
-    console.log(totalBudget + " - budget of client")
+    // console.log(totalBudget + " - budget of client")
     return totalBudget;
 }
 
@@ -118,5 +142,6 @@ module.exports = {
   getCustomerBudget,
   getBaseIngridientsOfOrder,
   getOrderDataFromTxt,
-  getRestaurantBudget
+  getRestaurantBudget,
+  getParseInputData
 };

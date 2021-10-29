@@ -1,4 +1,3 @@
-Restaurant budget: 300
-Buy, Julie Mirage, Princess Chicken -> Julie, 100, Princess Chicken, 90 -> seccess
-Buy, Elon Carousel, Tuna Cake -> Elon, 50, Tuna Cake, XXX -> NOT INAF MONEY
-Restaurant budget: 417
+Restaurant budget: 500
+Restaurant budget: 100
+Restaurant budget: 1000
