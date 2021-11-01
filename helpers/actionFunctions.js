@@ -44,6 +44,47 @@ const {
           
 };
 
+
+const getTableAction =  (
+  data,
+  i,
+  orderr,
+  getFoodIngredients,
+  foodIngredients,
+  baseIngredients,
+  customersBudgets,
+  ingredientsPrices,
+  customerAllergieProducts,
+  getBaseIngridientsOfOrder,
+  newRestaurantBudget
+    ) => {
+
+     ordersList = [data.action, data.arg, data.val]
+     let customer = ordersList[1]
+     let customerName = ordersList[1].split(" ")[0]
+     let order = ordersList[2]
+
+ let customerBudget = customersBudgets.find(x => x.customer === customer).budget;
+    const orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", ");
+    const alergiExist =  checkAllergiExist(
+      orderIngridients,
+      order,
+      customerAllergieProducts,
+      customer
+    );
+    let orderPrice =  parseInt(getOrderPrice(orderIngridients, ingredientsPrices))
+    if (customerBudget > orderPrice && ordersList.length >= 3) {
+            var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + orderPrice + " -> " + alergiExist;
+            newRestaurantBudget += (parseInt(orderPrice) * 1.3)
+            
+            return [resultOfOrder, parseInt(newRestaurantBudget)];
+          } else if (customerBudget < orderPrice) {
+            var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + "XXX" + " -> " + "NOT INAF MONEY";
+            return [resultOfOrder, newRestaurantBudget];
+          }
+          
+};
+
   const getOrderAction = (data, ingredientsPrices, newRestaurantBudget) => {
     ordersList = [data.action, data.arg, data.val]
     let orderName = data.arg

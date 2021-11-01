@@ -63,7 +63,24 @@ const res = async (sendReadedData) => {
       let result = getBudgetAction(data)
       newRestaurantBudget = result[1]
       resultData.push(result)
-    } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Buy' || parsedInputData[i].action === 'Table') {
+    } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Table') {
+      let res = getTableAction(
+        data,
+        i,
+        orderr,
+        getFoodIngredients,
+        foodIngredients,
+        baseIngredients,
+        customersBudgets,
+        ingredientsPrices,
+        customerAllergieProducts,
+        getBaseIngridientsOfOrder,
+        newRestaurantBudget
+        )
+        newRestaurantBudget = res[1] 
+        resultData.push(res[0])
+   
+    } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Buy') {
       let res = getBuyAction(
         data,
         i,
