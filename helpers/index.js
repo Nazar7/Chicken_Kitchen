@@ -32,6 +32,8 @@ const getBaseIngredientsPrices = (data) => {
   }
   return parsPrice;
   };
+
+  getBaseIngredientsPrices()
   
   const getCustomersBudgets = (data) => {
     let parsBudget = {};
@@ -48,7 +50,6 @@ const getFoodIngredients = (foodIngredients) => {
     parsFood[foodIngredients[element].food] =
       foodIngredients[element].ingredients.split(", ");
   }
-  console.log(parsFood)
   return parsFood;
 };
 
@@ -101,21 +102,19 @@ const checkAllergiExist = (result, capitalize, customerAllergieProduct, customer
 
 
 const getOrderPrice = (orderIngridients, ingredientsPrices) =>{
-  console.log("00000000000000000000000000000000000000000000000000000000000")
-  console.log(orderIngridients)
-  console.log("00000000000000000000000000000000000000000000000000000000000")
-  console.log(ingredientsPrices)
-  // console.log(orderIngridients + "============================")
+  let parsIngredientsPrices = {};
+  for (element in ingredientsPrices) {
+    parsIngredientsPrices[ingredientsPrices[element].ingredients] =
+    parseInt(ingredientsPrices[element].price);
+  }
   let totalOrderPrice = null;
     for (let i = 0;  i < orderIngridients.length; i++){
-      for (const [key, value] of Object.entries(ingredientsPrices)) {
+      for (const [key, value] of Object.entries(parsIngredientsPrices)) {
           if(key === orderIngridients[i]){
             totalOrderPrice += parseInt(value)
           }
       }
     }
-    // console.log(totalOrderPrice + " - total price of food")
-    console.log(totalOrderPrice)
     return totalOrderPrice;
 }
 
@@ -126,7 +125,6 @@ const getCustomerBudget = (customer, customerBudget) =>{
             totalBudget = parseInt(value)
           }
       }
-    // console.log(totalBudget + " - budget of client")
     return totalBudget;
 }
 
