@@ -10,6 +10,7 @@ const {
 
 const {
   getBuyAction,
+  getTableAction,
   getOrderAction,
   getBudgetAction,
   } = require("./helpers/actionFunctions.js")
@@ -28,6 +29,8 @@ const res = async (sendReadedData) => {
   const ordersList = await sendReadedData()
   const parsedInputData = getParseInputData(ordersList)
 
+console.log(parsedInputData.length)
+
   let restaurantBudget = 500;
   var resultData = [];
   resultData.push("Restaurant budget: " + restaurantBudget);
@@ -37,7 +40,7 @@ const res = async (sendReadedData) => {
     let customer = "";
     let orderr = "";
     let data = parsedInputData[i]
-    console.log(data)
+
 
     const foodIngredients = await getFoodIngredientsList()
 
@@ -49,16 +52,17 @@ const res = async (sendReadedData) => {
 
     const customersBudgets = await getCustomersBudgetsList()
 
-    if(newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg === "="){
+   
+    if(newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "="){
       let result = getBudgetAction(data)
       newRestaurantBudget = result[1]
       resultData.push(result.join(""))
-    } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg === "+") {
+    } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "+") {
     
       let result = getBudgetAction(data)
       newRestaurantBudget = result[1]
       resultData.push(result)
-    } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg === "-") {
+    } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "-") {
    
       let result = getBudgetAction(data)
       newRestaurantBudget = result[1]
@@ -77,8 +81,8 @@ const res = async (sendReadedData) => {
         getBaseIngridientsOfOrder,
         newRestaurantBudget
         )
-        newRestaurantBudget = res[1] 
-        resultData.push(res[0])
+        let customersOrderData = res[2].join("\n")
+        resultData.push(res[1], customersOrderData)
    
     } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Buy') {
       let res = getBuyAction(
@@ -95,9 +99,12 @@ const res = async (sendReadedData) => {
         newRestaurantBudget
         )
         newRestaurantBudget = res[1] 
-        resultData.push(res[0])
+        resultData.push(res[0].split())
     } else if (parsedInputData[i].action === 'Order'){
+      console.log(parsedInputData[i].action)
     let res = getOrderAction(data, ingredientsPrices, newRestaurantBudget)
+    // console.log(res[0])
+    // console.log(res[1])
     resultData.push(res[0])
     newRestaurantBudget = res[1]
     }

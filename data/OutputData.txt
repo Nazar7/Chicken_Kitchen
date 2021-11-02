@@ -1,5 +1,6 @@
 Restaurant budget: 500
-Restaurant budget: 300
 Buy,Julie Mirage,Princess Chicken -> Julie Mirage, 100, Princess Chicken, 90 -> seccess
-Buy,Elon Carousel,Tuna Cake -> Elon Carousel, 50, Tuna Cake, XXX -> NOT INAF MONEY
-Order,Tuna,5
+Buy,Barbara Smith,Tuna Cake -> Barbara Smith, 250, Tuna Cake, 100 -> seccess
+Table,Alexandra Smith,Adam Smith,Irish Fish,Fries -> seccess; money amount: 34
+Alexandra Smith, 500, Irish Fish, 31
+Adam Smith, 500, Fries, 3
