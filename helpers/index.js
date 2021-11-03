@@ -21,6 +21,22 @@ const getParseInputData = (ordersList) => {
   // return parsInputData
  }
 
+ const getParseWarehousData = (warehousData) => {
+  let parsedWarehousData = warehousData.split(", ")
+  let obj = {}
+  const keys = parsedWarehousData.filter((item, index) => {
+    return index % 2 == 0
+  });
+  const values = parsedWarehousData.filter((item, index) => {
+    return index % 2 !== 0
+  });
+  let warehousList = keys.forEach((element, index) => {
+    obj[element] = values[index]
+  });
+  return obj
+  }
+ 
+
 
 const getRestaurantBudget = (data) => {
   return data.split(`\n`)[0]
@@ -93,6 +109,38 @@ const getBaseIngridientsOfOrder = (order, foodIngredients, baseIngredients) => {
 }
 
 
+const parseBaseIngridients = (foodIngredients) => {
+let parseData = {};
+  for (element in foodIngredients) {
+    parseData[foodIngredients[element].food] =
+      foodIngredients[element].ingredients.split(", ");
+  }
+  return parseData
+}
+
+
+
+const getWarehousStockAfterOrder = (order, data, baseIngredients, foodIngredients) => {
+  return data[order].map((item) => {
+    for (const [key, value] of Object.entries(data)) {
+      if(item === key){
+        console.log(data[order].join(item))
+        console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        
+      }
+      return item
+    }
+      // if (baseIngredients.includes(item)) {
+      //   return item;
+      // }
+      return getWarehousStockAfterOrder(item, data, baseIngredients, foodIngredients);
+    })
+    .join("" + ", ");
+
+}
+
+
+
 const checkAllergiExist = (result, capitalize, customerAllergieProduct, customer) => {
   let data = ''
   let exist = false;
@@ -153,5 +201,8 @@ module.exports = {
   getBaseIngridientsOfOrder,
   getOrderDataFromTxt,
   getRestaurantBudget,
-  getParseInputData
+  getParseInputData,
+  getParseWarehousData,
+  getWarehousStockAfterOrder,
+  parseBaseIngridients
 };

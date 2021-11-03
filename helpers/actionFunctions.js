@@ -1,36 +1,49 @@
 const {
     checkAllergiExist,
     getOrderPrice,
+    parseBaseIngridients,
+    getWarehousStockAfterOrder,
   } = require("../helpers/index.js");
 
 
  const getBuyAction =  (
   data,
-  i,
-  orderr,
-  getFoodIngredients,
-  foodIngredients,
-  baseIngredients,
-  customersBudgets,
-  ingredientsPrices,
-  customerAllergieProducts,
-  getBaseIngridientsOfOrder,
-  newRestaurantBudget
+        i,
+        orderr,
+        getFoodIngredients,
+        foodIngredients,
+        baseIngredients,
+        customersBudgets,
+        ingredientsPrices,
+        customerAllergieProducts,
+        getBaseIngridientsOfOrder,
+        newRestaurantBudget,
     ) => {
 
+    
+      let parsefoodIngredients = parseBaseIngridients(foodIngredients)
+ 
+      
      ordersList = [data.action, data.arg, data.val]
      let customer = ordersList[1][0]
      let customerName = ordersList[1][0].split(" ")[0]
      let order = ordersList[2][0]
-
  let customerBudget = customersBudgets.find(x => x.customer === customer).budget;
+
     const orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", ");
+
+
+      let workData = getWarehousStockAfterOrder (order, parsefoodIngredients, baseIngredients, foodIngredients)
+      console.log(workData)
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
     const alergiExist =  checkAllergiExist(
       orderIngridients,
       order,
       customerAllergieProducts,
       customer
     );
+
     let orderPrice =  parseInt(getOrderPrice(orderIngridients, ingredientsPrices))
     if (customerBudget > orderPrice && ordersList.length >= 3) {
             var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + orderPrice + " -> " + alergiExist;

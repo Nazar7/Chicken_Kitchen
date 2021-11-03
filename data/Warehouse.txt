@@ -1,0 +1,1 @@
+Chicken, 10, Tuna, 10, Potatoes, 10, Asparagus, 10, Emperor Chicken, 1, Fries, 3

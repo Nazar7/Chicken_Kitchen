@@ -1,6 +1,8 @@
 const { getDataFromFile } = require("../services/index.js");
 
-
+const getWarehouseList = async () => (
+  await getDataFromFile("./data/Warehouse.txt")
+);
 
 const getFoodIngredientsList = async () => (
     await getDataFromFile("./data/FoodIngredients.csv")
@@ -35,4 +37,5 @@ const getFoodIngredientsList = async () => (
     getCustomerAllergieProductsList,
     getBaseIngredientsPricesList,
     getCustomersBudgetsList,
+    getWarehouseList,
   }

@@ -6,6 +6,7 @@ const {
     getCustomerAllergieProductsList,
     getBaseIngredientsPricesList,
     getCustomersBudgetsList,
+    
 } = require("./helpers/getData")
 
 const {
@@ -18,18 +19,31 @@ const {
 const {
   getBaseIngridientsOfOrder,
   getParseInputData,
-  getFoodIngredients
+  getFoodIngredients,
+  getParseWarehousData,
+  getWarehousStockAfterOrder,
 } = require("./helpers/index.js");
 
 const {
-  sendReadedData
+  sendReadedData,
 } = require("./services/dataFromFile.js")
 
-const res = async (sendReadedData) => {
-  const ordersList = await sendReadedData()
-  const parsedInputData = getParseInputData(ordersList)
+const {
+  sendReadedDataFromWarehouse,
+} = require("./services/dataFromTxtFile.js")
 
-console.log(parsedInputData.length)
+
+const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
+  const ordersList = await sendReadedData()
+  const warehousData = await sendReadedDataFromWarehouse()
+
+  const parsedInputData = getParseInputData(ordersList)
+  const parseWarehouseStock = getParseWarehousData(warehousData)
+// console.log(parseWarehouseStock)
+
+// console.log(parsedInputData.length)
+
+
 
   let restaurantBudget = 500;
   var resultData = [];
@@ -41,6 +55,7 @@ console.log(parsedInputData.length)
     let orderr = "";
     let data = parsedInputData[i]
 
+    
 
     const foodIngredients = await getFoodIngredientsList()
 
@@ -51,7 +66,6 @@ console.log(parsedInputData.length)
     const ingredientsPrices = await getBaseIngredientsPricesList()
 
     const customersBudgets = await getCustomersBudgetsList()
-
    
     if(newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "="){
       let result = getBudgetAction(data)
@@ -96,7 +110,8 @@ console.log(parsedInputData.length)
         ingredientsPrices,
         customerAllergieProducts,
         getBaseIngridientsOfOrder,
-        newRestaurantBudget
+        newRestaurantBudget,
+        parseWarehouseStock
         )
         newRestaurantBudget = res[1] 
         resultData.push(res[0].split())
@@ -116,5 +131,6 @@ console.log(parsedInputData.length)
     if (err) console.log(err);
   });
 }
-res(sendReadedData)
+res(sendReadedData, sendReadedDataFromWarehouse)
+
 

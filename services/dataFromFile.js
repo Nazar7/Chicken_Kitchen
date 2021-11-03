@@ -1,6 +1,6 @@
 const fs = require("fs");
-const sendReadedData = () => {
 
+const sendReadedData = () => {
 return new Promise((res, rej) => {
 fs.readFile("./data/InputData.txt", "utf8", async function (err, data) {
     var ordersList = data.split(/\r\n/);
@@ -12,7 +12,20 @@ fs.readFile("./data/InputData.txt", "utf8", async function (err, data) {
 })
 }
 
+// const sendReadedDataFromWarehouse = () => {
+//   return new Promise((res, rej) => {
+//   fs.readFile("./data/Warehouse.txt", "utf8", async function (err, warehouseData) {
+//     console.log(warehouseData)
+//       // var ordersList = data.split(/\r\n/);
+//       // console.log(ordersList)
+//       res(warehouseData)
+//         return warehouseData
+  
+//       });
+//   })
+//   }
 
 module.exports = {
-    sendReadedData
+    sendReadedData, 
+
   }
