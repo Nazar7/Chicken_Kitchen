@@ -1,9 +1,20 @@
 const {
     checkAllergiExist,
-    getOrderPrice,
-    parseBaseIngridients,
-    getWarehousStockAfterOrder,
   } = require("../helpers/index.js");
+
+  const {
+    parseBaseIngridients,
+  } = require("../dataHandlers/handleDishData");
+
+  const {
+    getWarehousStockAfterOrder,
+  } = require("../dataHandlers/handleWarehousData");
+
+  const {
+    getOrderPrice,
+  } = require("../dataHandlers/handleOrderData");
+
+
 
 
  const getBuyAction =  (

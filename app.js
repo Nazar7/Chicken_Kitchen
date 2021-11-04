@@ -1,12 +1,11 @@
 const fs = require("fs");
 
 const {
-  getBaseIngredientsList,
+    getBaseIngredientsList,
     getFoodIngredientsList,
     getCustomerAllergieProductsList,
     getBaseIngredientsPricesList,
     getCustomersBudgetsList,
-    
 } = require("./helpers/getData")
 
 const {
@@ -16,13 +15,26 @@ const {
   getBudgetAction,
   } = require("./helpers/actionFunctions.js")
 
-const {
-  getBaseIngridientsOfOrder,
-  getParseInputData,
-  getFoodIngredients,
-  getParseWarehousData,
-  getWarehousStockAfterOrder,
-} = require("./helpers/index.js");
+  const {
+    getFoodIngredients,
+  } = require("./dataHandlers/handleDishData")
+
+  const {
+    getBaseIngridientsOfOrder,
+  } = require("./dataHandlers/handleOrderData")
+
+  const {
+    getWarehousStockAfterOrder,
+  } = require("./dataHandlers/handleWarehousData")
+
+  const {
+    getParseInputData,
+  } = require("./dataHandlers/handleInputData")
+
+  const {
+    getParseWarehousData,
+    getWarehousStockAfterOrder
+  } = require("./dataHandlers/handleWarehousData")
 
 const {
   sendReadedData,
