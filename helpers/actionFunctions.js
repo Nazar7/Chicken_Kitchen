@@ -39,14 +39,15 @@ const {
      let customer = ordersList[1][0]
      let customerName = ordersList[1][0].split(" ")[0]
      let order = ordersList[2][0]
+     console.log(ordersList)
      console.log(order)
  let customerBudget = customersBudgets.find(x => x.customer === customer).budget;
 
     const orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", ");
-      console.log(orderIngridients)
+      // console.log(orderIngridients)
 
       let workData = getWarehousStockAfterOrder (order, parsefoodIngredients, baseIngredients, foodIngredients)
-      console.log(workData)
+      // console.log(workData)
       console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     const alergiExist =  checkAllergiExist(

@@ -16,16 +16,16 @@ const {
   } = require("./helpers/actionFunctions.js")
 
   const {
+    getCustomerAllergieProduct,
+  } = require("./dataHandlers/handleCustomersData")
+
+  const {
     getFoodIngredients,
   } = require("./dataHandlers/handleDishData")
 
   const {
     getBaseIngridientsOfOrder,
   } = require("./dataHandlers/handleOrderData")
-
-  const {
-    getWarehousStockAfterOrder,
-  } = require("./dataHandlers/handleWarehousData")
 
   const {
     getParseInputData,
@@ -128,7 +128,7 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
         newRestaurantBudget = res[1] 
         resultData.push(res[0].split())
     } else if (parsedInputData[i].action === 'Order'){
-      console.log(parsedInputData[i].action)
+      // console.log(parsedInputData[i].action)
     let res = getOrderAction(data, ingredientsPrices, newRestaurantBudget)
     // console.log(res[0])
     // console.log(res[1])
