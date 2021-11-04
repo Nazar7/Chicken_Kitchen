@@ -24,9 +24,29 @@ const getBaseIngredientsPrices = (data) => {
     }
     return parsFood;
   };
+
+  const getAllDishIngridients = (order, parseData, baseIngredients) => {
+    return parseData[order].map((item) => {
+      if(baseIngredients.includes(item)){
+      return item
+      } else {
+      return getAllDishIngridients (item, parseData, baseIngredients)
+      }
+  }).join("" + "," + parseData[order] + "" + ",")
+}
+
+const checkAllDishUniques = (order, dishIngridientsList) => {
+  dishIngridientsList.push(order)
+  uniqueData = dishIngridientsList.filter(function(item, pos) {
+    return dishIngridientsList.indexOf(item) == pos;
+})
+  return uniqueData
+}
   
   module.exports = {
   getFoodIngredients,
   getBaseIngredientsPrices,
-  parseBaseIngridients
+  parseBaseIngridients,
+  getAllDishIngridients,
+  checkAllDishUniques
   }

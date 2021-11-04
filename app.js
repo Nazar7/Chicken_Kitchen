@@ -50,8 +50,7 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
   const warehousData = await sendReadedDataFromWarehouse()
 
   const parsedInputData = getParseInputData(ordersList)
-  const parseWarehouseStock = getParseWarehousData(warehousData)
-// console.log(parseWarehouseStock)
+  const parsedWarehouseStock = getParseWarehousData(warehousData)
 
 // console.log(parsedInputData.length)
 
@@ -62,7 +61,7 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
   resultData.push("Restaurant budget: " + restaurantBudget);
   let newRestaurantBudget = restaurantBudget; 
   for (let i = 0; i <= parsedInputData.length-1; i++) {
-    console.log(newRestaurantBudget)
+    // console.log(newRestaurantBudget)
     let customer = "";
     let orderr = "";
     let data = parsedInputData[i]
@@ -105,7 +104,8 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
         ingredientsPrices,
         customerAllergieProducts,
         getBaseIngridientsOfOrder,
-        newRestaurantBudget
+        newRestaurantBudget,
+        warehousData
         )
         let customersOrderData = res[2].join("\n")
         resultData.push(res[1], customersOrderData)
@@ -123,7 +123,7 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
         customerAllergieProducts,
         getBaseIngridientsOfOrder,
         newRestaurantBudget,
-        parseWarehouseStock
+        parsedWarehouseStock
         )
         newRestaurantBudget = res[1] 
         resultData.push(res[0].split())

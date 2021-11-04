@@ -3,9 +3,9 @@ const getOrderDataFromTxt = (data) => {
   }
 
   const getBaseIngridientsOfOrder = (order, foodIngredients, baseIngredients) => {
-    console.log(order)
-    console.log(foodIngredients)
-    console.log(baseIngredients)
+    // console.log(order)
+    // console.log(foodIngredients)
+    // console.log(baseIngredients)
     let parsFood = {};
     for (element in foodIngredients) {
       parsFood[foodIngredients[element].food] =

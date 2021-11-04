@@ -4,10 +4,13 @@ const {
 
   const {
     parseBaseIngridients,
+    getAllDishIngridients,
+    checkAllDishUniques
   } = require("../dataHandlers/handleDishData");
 
   const {
-    getWarehousStockAfterOrder,
+    // getParseWarehousData,
+    getBalanceAtWarehous
   } = require("../dataHandlers/handleWarehousData");
 
   const {
@@ -19,36 +22,44 @@ const {
 
  const getBuyAction =  (
   data,
-        i,
-        orderr,
-        getFoodIngredients,
-        foodIngredients,
-        baseIngredients,
-        customersBudgets,
-        ingredientsPrices,
-        customerAllergieProducts,
-        getBaseIngridientsOfOrder,
-        newRestaurantBudget,
+  i,
+  orderr,
+  getFoodIngredients,
+  foodIngredients,
+  baseIngredients,
+  customersBudgets,
+  ingredientsPrices,
+  customerAllergieProducts,
+  getBaseIngridientsOfOrder,
+  newRestaurantBudget,
+  parsedWarehouseStock
     ) => {
 
-    
       let parsefoodIngredients = parseBaseIngridients(foodIngredients)
  
       
      ordersList = [data.action, data.arg, data.val]
+     console.log(ordersList)
      let customer = ordersList[1][0]
      let customerName = ordersList[1][0].split(" ")[0]
      let order = ordersList[2][0]
-     console.log(ordersList)
-     console.log(order)
+    //  console.log(ordersList)
+    //  console.log(order)
  let customerBudget = customersBudgets.find(x => x.customer === customer).budget;
 
-    const orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", ");
-      // console.log(orderIngridients)
+      // let warehousList = getParseWarehousData(warehousData)
+      // console.log(warehousDList)
 
-      let workData = getWarehousStockAfterOrder (order, parsefoodIngredients, baseIngredients, foodIngredients)
-      // console.log(workData)
-      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    let orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", ");
+
+    let dishIngridientsList = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, foodIngredients).split(",")
+    
+    let uniqueListOfDish = checkAllDishUniques(order, dishIngridientsList)
+
+
+    let warehousBalance = getBalanceAtWarehous(parsedWarehouseStock, uniqueListOfDish)
+    console.log(warehousBalance)
+      console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 
     const alergiExist =  checkAllergiExist(
       orderIngridients,
