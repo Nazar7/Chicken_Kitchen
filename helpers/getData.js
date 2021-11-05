@@ -18,7 +18,8 @@ const getFoodIngredientsList = async () => (
 
   const getCustomerAllergieProductsList = async () => (
     await getDataFromFile("./data/RegularCustomersAllergies.csv")
-  );
+    )
+  
 
 
   const getBaseIngredientsPricesList = async () =>  (

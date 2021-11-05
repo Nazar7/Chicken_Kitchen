@@ -14,12 +14,16 @@ const getParseWarehousData = (warehousData) => {
     return warehousDataList
     }
 
+    
     const getBalanceAtWarehous = (parsedWarehouseStock, uniqueListOfDish) => {
-      console.log(parsedWarehouseStock)
-      console.log(uniqueListOfDish)
-      
-      // let warehouseStockAfterOrder = 
-      // return parsedWarehouseStock
+      uniqueListOfDish.map((item, index, arr) => {
+          if(item in parsedWarehouseStock){
+             parsedWarehouseStock[item] = parsedWarehouseStock[item]-1
+          return
+          }
+        })
+            return parsedWarehouseStock
+    
     }
 
 

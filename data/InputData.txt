@@ -1,3 +1,4 @@
 Buy, Julie Mirage, Princess Chicken
+Order, Tuna, 1
 Buy, Barbara Smith, Tuna Cake
-Table, Alexandra Smith, Adam Smith, Irish Fish, Fries
+Buy, Alexandra Smith, Fries

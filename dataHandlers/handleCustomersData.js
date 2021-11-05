@@ -1,3 +1,5 @@
+
+
 const getCustomerAllergieProduct = (data, customer) => { 
     if(customer !== "") return data.find((o) => o.name === customer).product.split(", ");
   };
@@ -21,8 +23,50 @@ const getCustomerAllergieProduct = (data, customer) => {
       return totalBudget;
   }
 
+  const getParseCustomersAllergiesProducts = (customerAllergieProducts) =>{
+        let customersAllergies = {}
+        customerAllergieProducts.forEach((element, index) => {
+          customersAllergies[customerAllergieProducts[index].name] = customerAllergieProducts[index].product
+        })
+        return customersAllergies
+
+    
+  }
+
+  const checkAllergiExist = (orderIngridients, customersAllergiesList, customer, order) => {
+    let data = ''
+    let exist = false;
+    if(customer in customersAllergiesList){
+      let customerAllergieProduct = customersAllergiesList[customer].split(", ")
+      const found = orderIngridients.some(r=> customerAllergieProduct.includes(r))
+        if (found){
+          exist = true;
+          return data = customer + " - " + "can’t order " + order + " allergic to: " + customerAllergieProduct.join();
+        }
+        exist = false;
+         return data = "seccess"
+    };
+  
+    
+      // if (result.indexOf(customerAllergieProducts[i]) !== -1) {
+      //   exist = true;
+      //   // data = customer + " - " + capitalize + ": " + "can’t order, allergic to: " + customerAllergieProduct;
+      //   data = "can’t buy, allergic to " + customerAllergieProducts;
+      //   if(exist) return data;
+        
+      // } else {
+      //   exist = false;
+      //   // data = customer + " - " + capitalize + ": " + "success";
+      //   data = "seccess"
+      //   if(!exist) return data    
+      // }
+    
+  };
+
   module.exports = {
     getCustomerAllergieProduct,
     getCustomersBudgets,
     getCustomerBudget,
+    checkAllergiExist,
+    getParseCustomersAllergiesProducts
   };

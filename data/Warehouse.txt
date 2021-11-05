@@ -1,1 +1,1 @@
-Chicken, 10, Tuna, 10, Potatoes, 10, Asparagus, 10, Emperor Chicken, 1, Fries, 3
+Princess Chicken, 1, Tuna, 5, Chocolate, 5, Youth Sauce, 3, Potatoes, 10
