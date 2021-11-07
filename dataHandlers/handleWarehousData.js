@@ -1,5 +1,4 @@
 const getParseWarehousData = (warehousData) => {
-  console.log(warehousData)
     let parsedWarehousData = warehousData.split(", ")
     let warehousDataList = {}
     const keys = parsedWarehousData.filter((item, index) => {

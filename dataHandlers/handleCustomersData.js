@@ -1,8 +1,21 @@
-
-
 const getCustomerAllergieProduct = (data, customer) => { 
-    if(customer !== "") return data.find((o) => o.name === customer).product.split(", ");
+    if(customer !== "") return data.find(({customer}) => customer === customer).product.split(", ");
   };
+
+  
+  // const getParsedCustomersBudgets = async () =>{
+  //  const customersBudgets = await getCustomersBudgetsList()
+  //   let parseData = {};
+  //   // console.log(customersBudgets[0][customer])
+  //   // console.log(customersBudgets[0].customer)
+  //   // console.log(customersBudgets[0].budget)
+  //   // for (let i = 0; i <= customersBudgets.length-1; i++){
+  //   //   parseData[customersBudgets[i].customer] = customersBudgets[i].budget
+  //   // }
+  //     return customersBudgets
+  //   }
+
+  
 
   const getCustomersBudgets = (data) => {
     let parsBudget = {};
@@ -68,5 +81,6 @@ const getCustomerAllergieProduct = (data, customer) => {
     getCustomersBudgets,
     getCustomerBudget,
     checkAllergiExist,
-    getParseCustomersAllergiesProducts
+    getParseCustomersAllergiesProducts,
+    // getParsedCustomersBudgets
   };

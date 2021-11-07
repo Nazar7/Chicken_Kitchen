@@ -10,6 +10,7 @@ const getParseInputData = (ordersList) => {
         parsInputData.push({ action, arg, val });
     }
     return parsInputData
+
   // console.log(parsInputData)
     // let parsInputData = [];
     // for (let i = 0; i <= ordersList.length-1; i++) {

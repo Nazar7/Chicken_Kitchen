@@ -43,27 +43,20 @@
  
       
      ordersList = [data.action, data.arg, data.val]
-    // console.log(ordersList)
      let customer = ordersList[1][0]
      let customerName = ordersList[1][0].split(" ")[0]
      let order = ordersList[2][0]
-    //  console.log(ordersList)
-    //  console.log(order)
- let customerBudget = parseInt(customersBudgets.find(x => x.customer === customer).budget);
+
+    const customerBudget = parseInt(customersBudgets.find( ({ customer }) => customer === customer ).budget);
+
  let customerAllergieProduct = getCustomerAllergieProduct(customerAllergieProducts, customer);
-
-
-      // let warehousList = getParseWarehousData(warehousData)
-      // console.log(parsedWarehouseStock)
 
     let orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", ");
 
     // let dishIngridientsList = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
 
-    // console.log(dishIngridientsList)
 
     const customersAllergiesList = getParseCustomersAllergiesProducts(customerAllergieProducts)
-    // console.log(customersAllergiesList)
 
     const alergiExist =  checkAllergiExist(
       orderIngridients, 
@@ -73,12 +66,10 @@
 
     let orderPrice =  parseInt(getOrderPrice(orderIngridients, ingredientsPrices))
 
-    // console.log(alergiExist)
     if (customerBudget > orderPrice && ordersList.length == 3 && alergiExist === "seccess") {
             var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + orderPrice + " -> " + alergiExist;
             newRestaurantBudget += (parseInt(orderPrice) * 1.3)
             let dishIngridientsList = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
-            // console.log(dishIngridientsList)
             return [resultOfOrder, parseInt(newRestaurantBudget)];
           } else if (customerBudget < orderPrice) {
             var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + "XXX" + " -> " + "NOT INAF MONEY";
@@ -86,7 +77,6 @@
           }else if (alergiExist !== "seccess") {
             var resultOfOrder = alergiExist
             let dishIngridientsList = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
-            // console.log(dishIngridientsList)
             return [resultOfOrder, newRestaurantBudget];
           }
 };
