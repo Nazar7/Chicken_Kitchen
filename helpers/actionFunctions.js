@@ -48,10 +48,11 @@
      let order = ordersList[2][0]
 
     const customerBudget = parseInt(customersBudgets.find( ({ customer }) => customer === customer ).budget);
-
+    
  let customerAllergieProduct = getCustomerAllergieProduct(customerAllergieProducts, customer);
 
     let orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", ");
+  
 
     // let dishIngridientsList = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
 
@@ -68,16 +69,18 @@
 
     if (customerBudget > orderPrice && ordersList.length == 3 && alergiExist === "seccess") {
             var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + orderPrice + " -> " + alergiExist;
-            newRestaurantBudget += (parseInt(orderPrice) * 1.3)
+            newRestaurantBudget += orderPrice * 1.3
             let dishIngridientsList = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
-            return [resultOfOrder, parseInt(newRestaurantBudget)];
+            // parsedWarehouseStock[orderName] = parseInt(parsedWarehouseStock[orderName]) - orderQuantity
+            return [resultOfOrder, parseInt(newRestaurantBudget), parsedWarehouseStock];
           } else if (customerBudget < orderPrice) {
             var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + "XXX" + " -> " + "NOT INAF MONEY";
             return [resultOfOrder, newRestaurantBudget];
           }else if (alergiExist !== "seccess") {
             var resultOfOrder = alergiExist
+            parsedWarehouseStock[orderName] = parseInt(parsedWarehouseStock[orderName]) - orderQuantity
             let dishIngridientsList = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
-            return [resultOfOrder, newRestaurantBudget];
+            return [resultOfOrder, newRestaurantBudget, parsedWarehouseStock];
           }
 };
 
@@ -162,8 +165,9 @@ const getTableAction =  (
           orderResult = [ordersList, newRestaurantBudget, parsedWarehouseStock]
           return orderResult
          }
-         parsedWarehouseStock[orderName] = parseInt(parsedWarehouseStock[orderName]) + orderQuantity
+         parsedWarehouseStock[orderName] = parseInt(parsedWarehouseStock[orderName]) + orderQuantity  
          orderResult = [ordersList, newRestaurantBudget, parsedWarehouseStock]
+         console.log(orderResult[2])
          return orderResult
        } 
       }

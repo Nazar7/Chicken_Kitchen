@@ -26,15 +26,17 @@ const getCustomerAllergieProduct = (data, customer) => {
   return parsBudget;
   };
 
-  const getCustomerBudget = (customer, customerBudget) =>{
-    let totalBudget = null;
-        for (const [key, value] of Object.entries(customerBudget)) {
-            if(key === customer){
-              totalBudget = parseInt(value)
-            }
-        }
-      return totalBudget;
-  }
+  // const getCustomerBudget = (customer, customerBudget) =>{
+  //   console.log(customerBudget)
+  //   let totalBudget = null;
+  //       for (const [key, value] of Object.entries(customerBudget)) {
+  //           if(key === customer){
+  //             totalBudget = parseInt(value)
+  //           }
+  //       }
+  //       console.log(totalBudget)
+  //     return totalBudget;
+  // }
 
   const getParseCustomersAllergiesProducts = (customerAllergieProducts) =>{
         let customersAllergies = {}
@@ -42,8 +44,6 @@ const getCustomerAllergieProduct = (data, customer) => {
           customersAllergies[customerAllergieProducts[index].name] = customerAllergieProducts[index].product
         })
         return customersAllergies
-
-    
   }
 
   const checkAllergiExist = (orderIngridients, customersAllergiesList, customer, order) => {
@@ -79,7 +79,7 @@ const getCustomerAllergieProduct = (data, customer) => {
   module.exports = {
     getCustomerAllergieProduct,
     getCustomersBudgets,
-    getCustomerBudget,
+    // getCustomerBudget,
     checkAllergiExist,
     getParseCustomersAllergiesProducts,
     // getParsedCustomersBudgets

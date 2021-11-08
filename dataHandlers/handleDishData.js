@@ -7,37 +7,44 @@ const parseBaseIngridients = (foodIngredients) => {
       return parseData
     }
 
-const getBaseIngredientsPrices = (data) => {
-    let parsPrice = {};
-  for (element in data) {
-    parsPrice[data[element].ingredients] =
-    data[element].price.split(", ");
-  }
-  return parsPrice;
-  };
+// const getBaseIngredientsPrices = (data) => {
+//   console.log(data)
+//     let parsPrice = {};
+//   for (element in data) {
+//     parsPrice[data[element].ingredients] =
+//     data[element].price.split(", ");
+//   }
+//   console.log(parsPrice)
+//   return parsPrice;
+//   };
 
-  const getFoodIngredients = (foodIngredients) => {
-    let parsFood = {};
-    for (element in foodIngredients) {
-      parsFood[foodIngredients[element].food] =
-        foodIngredients[element].ingredients.split(", ");
-    }
-    return parsFood;
-  };
+  // const getFoodIngredients = (foodIngredients) => {
+  //   console.log(getFoodIngredients)
+  //   let parsFood = {};
+  //   for (element in foodIngredients) {
+  //     parsFood[foodIngredients[element].food] =
+  //       foodIngredients[element].ingredients.split(", ");
+  //   }
+  //   console.log(parsFood)
+  //   return parsFood;
+  // };
 
 
 
   const getAllDishIngridients = (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock) => {
     if(order in parsedWarehouseStock){
       parsedWarehouseStock[order] = parsedWarehouseStock[order]-1
+     
       return parsedWarehouseStock
     } else {
       return parsefoodIngredients[order].map(function(item, idex) {
         if(item in parsedWarehouseStock){
         parsedWarehouseStock[item] = parsedWarehouseStock[item]-1
+        
          return parsedWarehouseStock
         } else {
           getAllDishIngridients (item, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
+         
           return parsedWarehouseStock
         }
       })
@@ -64,8 +71,8 @@ const getBaseIngredientsPrices = (data) => {
 // }
   
   module.exports = {
-  getFoodIngredients,
-  getBaseIngredientsPrices,
+  // getFoodIngredients,
+  // getBaseIngredientsPrices,
   parseBaseIngridients,
   getAllDishIngridients,
   // checkAllDishUniques

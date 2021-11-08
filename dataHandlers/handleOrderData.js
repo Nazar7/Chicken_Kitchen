@@ -1,6 +1,7 @@
-const getOrderDataFromTxt = (data) => {
-    return data
-  }
+// const getOrderDataFromTxt = (data) => {
+//   console.log(data)
+//     return data
+//   }
 
   const getBaseIngridientsOfOrder = (order, foodIngredients, baseIngredients) => {
     let parsFood = {};
@@ -39,6 +40,6 @@ const getOrderDataFromTxt = (data) => {
   module.exports = {
     getOrderPrice,
     getBaseIngridientsOfOrder,
-    getOrderDataFromTxt,
+    // getOrderDataFromTxt,
 
   };

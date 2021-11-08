@@ -79,6 +79,7 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
   
     const customersBudgets = await getCustomersBudgetsList()
 
+
     const parsedCustomersAllergiesProducts = getParseCustomersAllergiesProducts(customerAllergieProducts)
    
     if(newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "="){
@@ -134,7 +135,6 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
     let res = getOrderAction(data, ingredientsPrices, newRestaurantBudget, parsedWarehouseStock)
     resultData.push(res[0])
     newRestaurantBudget = res[1]
-    
     }
     else resultData.push("RESTAURANT BANKRUPT")
   }
