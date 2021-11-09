@@ -2,6 +2,7 @@ const getParseInputData = (ordersList) => {
     const parsInputData = []
     let tableCustomers = []
     for (let i = 0; i <= ordersList.length-1; i++) {
+      console.log()
       let tableParsInputData = ordersList[i].split(", ")
       let actionName = tableParsInputData.shift();
         tableCustomers = tableParsInputData.slice(0,tableParsInputData.length/2);

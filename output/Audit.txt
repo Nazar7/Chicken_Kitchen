@@ -1,0 +1,9 @@
+command:Buy,Alexandra Smith,Fries -> Alexandra Smith, 80, Fries, 3 -> seccess
+Warehouse:{"Princess Chicken":"1","Tuna":"5","Chocolate":"5","Youth Sauce":"3","Potatoes":19}
+Budget:503.9
+command:Order, Potatoes, 10-> success
+Warehouse:{"Princess Chicken":"1","Tuna":"5","Chocolate":"5","Youth Sauce":"3","Potatoes":19}
+Budget:473.9
+command:Buy,Alexandra Smith,Princess Chicken -> Alexandra Smith, 80, Princess Chicken, XXX -> NOT INAF MONEY
+Warehouse:{"Princess Chicken":"1","Tuna":"5","Chocolate":"5","Youth Sauce":"3","Potatoes":19}
+Budget:473.9

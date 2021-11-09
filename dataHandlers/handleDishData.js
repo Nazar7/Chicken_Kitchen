@@ -32,20 +32,17 @@ const parseBaseIngridients = (foodIngredients) => {
 
 
   const getAllDishIngridients = (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock) => {
-    if(order in parsedWarehouseStock){
-      parsedWarehouseStock[order] = parsedWarehouseStock[order]-1
-     
-      return parsedWarehouseStock
+    if(order in parsedWarehouseStock[0]){
+      parsedWarehouseStock[0][order] = parsedWarehouseStock[0][order]-1
+      return parsedWarehouseStock[0]
     } else {
       return parsefoodIngredients[order].map(function(item, idex) {
-        if(item in parsedWarehouseStock){
-        parsedWarehouseStock[item] = parsedWarehouseStock[item]-1
-        
-         return parsedWarehouseStock
+        if(item in parsedWarehouseStock[0]){
+          parsedWarehouseStock[0][item] = parsedWarehouseStock[0][item]-1
+         return parsedWarehouseStock[0]
         } else {
           getAllDishIngridients (item, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
-         
-          return parsedWarehouseStock
+          return parsedWarehouseStock[0]
         }
       })
     }

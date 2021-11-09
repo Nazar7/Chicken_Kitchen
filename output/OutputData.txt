@@ -1,0 +1,6 @@
+Restaurant budget: 500
+Buy,Alexandra Smith,Fries -> Alexandra Smith, 80, Fries, 3 -> seccess
+Order, Potatoes, 10
+Buy,Alexandra Smith,Princess Chicken -> Alexandra Smith, 80, Princess Chicken, XXX -> NOT INAF MONEY
+Buy,Alexandra Smith,Fries -> Alexandra Smith, 80, Fries, 3 -> seccess
+Restaurant budget: 477.79999999999995

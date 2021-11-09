@@ -1,0 +1,5 @@
+Buy, Alexandra Smith, Fries
+Order, Potatoes, 10
+Buy, Alexandra Smith, Princess Chicken
+Audit, Resources
+Buy, Alexandra Smith, Fries

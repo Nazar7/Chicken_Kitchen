@@ -13,6 +13,7 @@ const {
   getTableAction,
   getOrderAction,
   getBudgetAction,
+  getAuditAction
   } = require("./helpers/actionFunctions.js")
 
   const {
@@ -63,7 +64,10 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
   var resultData = [];
   resultData.push("Restaurant budget: " + restaurantBudget);
   let newRestaurantBudget = restaurantBudget;
-  let newParsedWarehouseStock = parsedWarehouseStock 
+  let newParsedWarehouseStock = []
+  newParsedWarehouseStock.push(parsedWarehouseStock);
+  let auditList = []
+  let auditResult = []
   for (let i = 0; i <= parsedInputData.length-1; i++) {
     let customer = "";
     let orderr = "";
@@ -83,17 +87,17 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
     const parsedCustomersAllergiesProducts = getParseCustomersAllergiesProducts(customerAllergieProducts)
    
     if(newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "="){
-      let result = getBudgetAction(data)
+      let result = getBudgetAction(data, auditList)
       newRestaurantBudget = result[1]
       resultData.push(result.join(""))
     } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "+") {
     
-      let result = getBudgetAction(data)
+      let result = getBudgetAction(data, auditList)
       newRestaurantBudget = result[1]
       resultData.push(result)
     } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "-") {
    
-      let result = getBudgetAction(data)
+      let result = getBudgetAction(data, auditList)
       newRestaurantBudget = result[1]
       resultData.push(result)
     } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Table') {
@@ -109,7 +113,8 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
         customerAllergieProducts,
         getBaseIngridientsOfOrder,
         newRestaurantBudget,
-        parsedWarehouseStock
+        parsedWarehouseStock,
+        auditList
         )
         let customersOrderData = res[2].join("\n")
         resultData.push(res[1], customersOrderData)
@@ -126,21 +131,42 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
         ingredientsPrices,
         getBaseIngridientsOfOrder,
         newRestaurantBudget,
-        parsedWarehouseStock,
-        customerAllergieProducts
+        newParsedWarehouseStock,
+        customerAllergieProducts,
+        auditList
         )
-        newRestaurantBudget = res[1] 
-        resultData.push(res[0].split())
+        newParsedWarehouseStock = res.warehouseStock
+        newRestaurantBudget = res.newRestaurantBudget
+        resultData.push(res.resultOfOrder)
+        auditList.push({
+          comand: res.resultOfOrder,
+          Warehouse: newParsedWarehouseStock[0],
+          Budget: newRestaurantBudget
+        })
     } else if (parsedInputData[i].action === 'Order'){
     let res = getOrderAction(data, ingredientsPrices, newRestaurantBudget, parsedWarehouseStock)
-    resultData.push(res[0])
-    newRestaurantBudget = res[1]
-    }
+    resultData.push(res.listResult)
+    newRestaurantBudget = res.newRestaurantBudget
+    auditList.push({
+      comand: res.listResult + "-> success",
+      Warehouse: res.parsedWarehouseStock,
+      Budget: newRestaurantBudget
+    })
+    } else if (parsedInputData[i].action === 'Audit'){
+      // let res = getAuditAction(auditList)
+
+      auditResult.push(getAuditAction(auditList))
+
+      }
+      
     else resultData.push("RESTAURANT BANKRUPT")
   }
 
   resultData.push("Restaurant budget: " + newRestaurantBudget);
-  fs.writeFile("./data/OutputData.txt", resultData.join("\n"), (err) => {
+  fs.writeFile("./output/OutputData.txt", resultData.join("\n"), (err) => {
+    if (err) console.log(err);
+  });
+  fs.writeFile("./output/Audit.txt", auditResult.join(), (err) => {
     if (err) console.log(err);
   });
 }
