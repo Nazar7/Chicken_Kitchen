@@ -31,18 +31,19 @@ const parseBaseIngridients = (foodIngredients) => {
 
 
 
-  const getAllDishIngridients = (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock) => {
-    if(order in parsedWarehouseStock[0]){
-      parsedWarehouseStock[0][order] = parsedWarehouseStock[0][order]-1
-      return parsedWarehouseStock[0]
+  const getAllDishIngridients = (order, parsefoodIngredients, baseIngredients, newParsedWarehouseStock) => {
+
+    if(order in newParsedWarehouseStock[0]){
+      newParsedWarehouseStock[0][order] = newParsedWarehouseStock[0][order]-1
+      return newParsedWarehouseStock[0]
     } else {
       return parsefoodIngredients[order].map(function(item, idex) {
-        if(item in parsedWarehouseStock[0]){
-          parsedWarehouseStock[0][item] = parsedWarehouseStock[0][item]-1
-         return parsedWarehouseStock[0]
+        if(item in newParsedWarehouseStock[0]){
+          newParsedWarehouseStock[0][item] = newParsedWarehouseStock[0][item]-1
+         return newParsedWarehouseStock[0]
         } else {
-          getAllDishIngridients (item, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
-          return parsedWarehouseStock[0]
+          getAllDishIngridients (item, parsefoodIngredients, baseIngredients, newParsedWarehouseStock)
+          return newParsedWarehouseStock[0]
         }
       })
     }

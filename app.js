@@ -65,7 +65,7 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
   resultData.push("Restaurant budget: " + restaurantBudget);
   let newRestaurantBudget = restaurantBudget;
   let newParsedWarehouseStock = []
-  newParsedWarehouseStock.push(parsedWarehouseStock);
+  newParsedWarehouseStock.push(parsedWarehouseStock)
   let auditList = []
   let auditResult = []
   for (let i = 0; i <= parsedInputData.length-1; i++) {
@@ -85,19 +85,21 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
 
 
     const parsedCustomersAllergiesProducts = getParseCustomersAllergiesProducts(customerAllergieProducts)
+
+
    
     if(newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "="){
-      let result = getBudgetAction(data, auditList)
+      let result = getBudgetAction(data, newParsedWarehouseStock)
       newRestaurantBudget = result[1]
       resultData.push(result.join(""))
     } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "+") {
     
-      let result = getBudgetAction(data, auditList)
+      let result = getBudgetAction(data, newParsedWarehouseStock)
       newRestaurantBudget = result[1]
       resultData.push(result)
     } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "-") {
    
-      let result = getBudgetAction(data, auditList)
+      let result = getBudgetAction(data, newParsedWarehouseStock)
       newRestaurantBudget = result[1]
       resultData.push(result)
     } else if (newRestaurantBudget > 0 && parsedInputData[i].action === 'Table') {
@@ -114,7 +116,7 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
         getBaseIngridientsOfOrder,
         newRestaurantBudget,
         parsedWarehouseStock,
-        auditList
+        newParsedWarehouseStock
         )
         let customersOrderData = res[2].join("\n")
         resultData.push(res[1], customersOrderData)
@@ -133,34 +135,49 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
         newRestaurantBudget,
         newParsedWarehouseStock,
         customerAllergieProducts,
-        auditList
         )
-        newParsedWarehouseStock = res.warehouseStock
+ 
+        // auditList.push(res)
+        console.log(res)
+        // resultData.push(res.resultOfOrder)
+        newParsedWarehouseStock = res.newParsedWarehouseStock
         newRestaurantBudget = res.newRestaurantBudget
-        resultData.push(res.resultOfOrder)
         auditList.push({
           comand: res.resultOfOrder,
-          Warehouse: newParsedWarehouseStock[0],
+          Warehouse: newParsedWarehouseStock,
           Budget: newRestaurantBudget
         })
-    } else if (parsedInputData[i].action === 'Order'){
-    let res = getOrderAction(data, ingredientsPrices, newRestaurantBudget, parsedWarehouseStock)
-    resultData.push(res.listResult)
-    newRestaurantBudget = res.newRestaurantBudget
-    auditList.push({
-      comand: res.listResult + "-> success",
-      Warehouse: res.parsedWarehouseStock,
-      Budget: newRestaurantBudget
-    })
-    } else if (parsedInputData[i].action === 'Audit'){
-      // let res = getAuditAction(auditList)
+       
 
-      auditResult.push(getAuditAction(auditList))
+        // console.log(JSON.stringify(auditList) + " BUY ACTION")
+    } 
+    else if (parsedInputData[i].action === 'Order'){
+
+    let res = getOrderAction(data, ingredientsPrices, newRestaurantBudget, newParsedWarehouseStock)
+
+    // auditList.push(res)
+    console.log(res)
+    // resultData.push(res.listResult)
+    newRestaurantBudget = res.newRestaurantBudget
+    newParsedWarehouseStock = res.newParsedWarehouseStock
+    // auditList.push({
+    //   comand: res.listResult + "-> success",
+    //   Warehouse: newParsedWarehouseStock,
+    //   Budget: newRestaurantBudget
+    // })
+    } 
+    else if (parsedInputData[i].action === 'Audit'){
+      let res = getAuditAction(auditList)
+      console.log(res)
+
+      auditResult.push(res)
 
       }
       
     else resultData.push("RESTAURANT BANKRUPT")
   }
+
+
 
   resultData.push("Restaurant budget: " + newRestaurantBudget);
   fs.writeFile("./output/OutputData.txt", resultData.join("\n"), (err) => {
