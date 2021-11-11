@@ -7,71 +7,28 @@ const parseBaseIngridients = (foodIngredients) => {
       return parseData
     }
 
-// const getBaseIngredientsPrices = (data) => {
-//   console.log(data)
-//     let parsPrice = {};
-//   for (element in data) {
-//     parsPrice[data[element].ingredients] =
-//     data[element].price.split(", ");
-//   }
-//   console.log(parsPrice)
-//   return parsPrice;
-//   };
-
-  // const getFoodIngredients = (foodIngredients) => {
-  //   console.log(getFoodIngredients)
-  //   let parsFood = {};
-  //   for (element in foodIngredients) {
-  //     parsFood[foodIngredients[element].food] =
-  //       foodIngredients[element].ingredients.split(", ");
-  //   }
-  //   console.log(parsFood)
-  //   return parsFood;
-  // };
-
 
 
   const getAllDishIngridients = (order, parsefoodIngredients, baseIngredients, newParsedWarehouseStock) => {
-
-    if(order in newParsedWarehouseStock[0]){
-      newParsedWarehouseStock[0][order] = newParsedWarehouseStock[0][order]-1
-      return newParsedWarehouseStock[0]
+    if(order in newParsedWarehouseStock){
+      newParsedWarehouseStock[order] = newParsedWarehouseStock[order]-1
+      return newParsedWarehouseStock
     } else {
       return parsefoodIngredients[order].map(function(item, idex) {
-        if(item in newParsedWarehouseStock[0]){
-          newParsedWarehouseStock[0][item] = newParsedWarehouseStock[0][item]-1
-         return newParsedWarehouseStock[0]
+        if(item in newParsedWarehouseStock){
+          newParsedWarehouseStock[item] = newParsedWarehouseStock[item]-1
+         return newParsedWarehouseStock
         } else {
           getAllDishIngridients (item, parsefoodIngredients, baseIngredients, newParsedWarehouseStock)
-          return newParsedWarehouseStock[0]
+          return newParsedWarehouseStock
         }
       })
     }
 }
 
 
-//   const getAllDishIngridients = (order, parseData, baseIngredients) => {
-//     return parseData[order].map((item) => {
-//       if(baseIngredients.includes(item)){
-//       return item
-//       } else {
-//       return getAllDishIngridients (item, parseData, baseIngredients)
-//       }
-//   }).join("" + "," + parseData[order] + "" + ",")
-// }
-
-// const checkAllDishUniques = (order, dishIngridientsList) => {
-//   // dishIngridientsList.push(order)
-//   uniqueData = dishIngridientsList.filter(function(item, pos) {
-//     return dishIngridientsList.indexOf(item) == pos;
-// })
-//   return uniqueData
-// }
-  
   module.exports = {
-  // getFoodIngredients,
-  // getBaseIngredientsPrices,
   parseBaseIngridients,
   getAllDishIngridients,
-  // checkAllDishUniques
+
   }

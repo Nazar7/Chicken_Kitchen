@@ -1,17 +1,7 @@
-// const {
-//     checkAllergiExist,
-//   } = require("../helpers/index.js");
-
-  const {
+const {
     parseBaseIngridients,
     getAllDishIngridients,
-    checkAllDishUniques
   } = require("../dataHandlers/handleDishData");
-
-  const {
-    getParseWarehousData,
-    getBalanceAtWarehous
-  } = require("../dataHandlers/handleWarehousData");
 
   const {
     getOrderPrice,
@@ -35,30 +25,23 @@
         ingredientsPrices,
         getBaseIngridientsOfOrder,
         newRestaurantBudget,
-        newParsedWarehouseStock,
         customerAllergieProducts,
+        newParsedWarehouseStock
     ) => {
 
+
       let parsefoodIngredients = parseBaseIngridients(foodIngredients)
- 
-      
+     
      ordersList = [data.action, data.arg, data.val]
      let customer = ordersList[1][0]
-     let customerName = ordersList[1][0].split(" ")[0]
      let order = ordersList[2][0]
 
     const customerBudget = parseInt(customersBudgets.find( ({ customer }) => customer === customer ).budget);
     
  let customerAllergieProduct = getCustomerAllergieProduct(customerAllergieProducts, customer);
 
-    let orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", ");
-  
-
-    // let dishIngridientsList = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, parsedWarehouseStock)
-
-
+    let orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", "); 
     const customersAllergiesList = getParseCustomersAllergiesProducts(customerAllergieProducts)
-
     const alergiExist =  checkAllergiExist(
       orderIngridients, 
       customersAllergiesList, 
@@ -71,20 +54,11 @@
             var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + orderPrice + " -> " + alergiExist;
             newRestaurantBudget += orderPrice * 1.3
             let warehouseStock = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, newParsedWarehouseStock)
-            
-            newParsedWarehouseStock = warehouseStock[0]
-            // console.log(newParsedWarehouseStock)
-            // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            
-            // newParsedWarehouseStock[orderName] = parseInt(newParsedWarehouseStock[orderName]) - orderQuantity
-            // console.log(dishIngridientsList)
-            
-            return {resultOfOrder, newRestaurantBudget, newParsedWarehouseStock};
+            newParsedWarehouseStock = warehouseStock[0] 
+            return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}};
           } else if (customerBudget < orderPrice) {
             var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + "XXX" + " -> " + "NOT INAF MONEY";
-
-
-            return {resultOfOrder, newRestaurantBudget, warehouseStock};
+            return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}};
           }else if (alergiExist !== "seccess") {
             var resultOfOrder = alergiExist
             // parsedWarehouseStock[orderName] = parseInt(parsedWarehouseStock[orderName]) - orderQuantity
@@ -94,7 +68,7 @@
             //   Warehouse: newParsedWarehouseStock[0],
             //   Budget: newRestaurantBudget
             // })
-            return {resultOfOrder, newRestaurantBudget, warehouseStock};
+            return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}};
           }
 };
 
@@ -153,16 +127,13 @@ const getTableAction =  (
 
 
 
-
   const getOrderAction = (data, ingredientsPrices, newRestaurantBudget, newParsedWarehouseStock) => {
-    // ordersList = [data.action, data.arg, data.val]
-    let listResult = ""
+    let resultOfOrder = ""
     let orderAction = data.action;
     let orderName = data.arg[0]
     let orderQuantity = parseInt(data.val)
     let restaurantBudget = newRestaurantBudget
     let parsIngredientsPrices = {};
-
     for (element in ingredientsPrices) {
       parsIngredientsPrices[ingredientsPrices[element].ingredients] =
       parseInt(ingredientsPrices[element].price);
@@ -180,15 +151,13 @@ const getTableAction =  (
        } else if( orderName in newParsedWarehouseStock){
         newRestaurantBudget = restaurantBudget - resturanOrderPrice;
          newParsedWarehouseStock[orderName] = parseInt(newParsedWarehouseStock[orderName]) + orderQuantity
-          listResult = (orderAction + ", " + orderName + ", " + orderQuantity )
-          // console.log(newParsedWarehouseStock)
-          return {listResult, newRestaurantBudget, newParsedWarehouseStock}
-         }
+         resultOfOrder = (orderAction + ", " + orderName + ", " + orderQuantity )
+          return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}}
+         } else
          newRestaurantBudget = restaurantBudget - resturanOrderPrice;
          newParsedWarehouseStock.orderName == orderQuantity
-          listResult = (orderAction + ", " + orderName + ", " + orderQuantity)
-     
-         return {listResult, newRestaurantBudget, newParsedWarehouseStock}
+         resultOfOrder = (orderAction + ", " + orderName + ", " + orderQuantity)
+         return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}}
       }
     }
     console.log("There is no such order in ingredient list")
@@ -211,11 +180,9 @@ const getTableAction =  (
 
 
   const getAuditAction =  (auditList) => {
-    // console.log(auditList)
-    // console.log(newParsedWarehouseStock)
     let outputAuditList = []
     auditList.forEach(element => {
-      outputAuditList.push("command:" + element.comand + "\n" + "Warehouse:" + JSON.stringify(element.Warehouse) + "\n" + "Budget:" + JSON.stringify(element.Budget) + "\n")
+      outputAuditList.push("command:" + element.comand + "\n" + "Warehouse:" + JSON.stringify(element.Warehouse) + "\n" + "Budget:" + element.Budget + "\n")
     });
     return outputAuditList.join('')
   };

@@ -87,7 +87,6 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
     const parsedCustomersAllergiesProducts = getParseCustomersAllergiesProducts(customerAllergieProducts)
 
 
-   
     if(newRestaurantBudget > 0 && parsedInputData[i].action === 'Budget' && parsedInputData[i].arg[0] === "="){
       let result = getBudgetAction(data, newParsedWarehouseStock)
       newRestaurantBudget = result[1]
@@ -133,45 +132,31 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
         ingredientsPrices,
         getBaseIngridientsOfOrder,
         newRestaurantBudget,
-        newParsedWarehouseStock,
         customerAllergieProducts,
+        ...newParsedWarehouseStock
         )
- 
-        // auditList.push(res)
-        console.log(res)
-        // resultData.push(res.resultOfOrder)
-        newParsedWarehouseStock = res.newParsedWarehouseStock
-        newRestaurantBudget = res.newRestaurantBudget
+        resultData.push(res.resultOfOrder)
+         newRestaurantBudget = res.newRestaurantBudget
         auditList.push({
           comand: res.resultOfOrder,
-          Warehouse: newParsedWarehouseStock,
+          Warehouse: res.warehous,
           Budget: newRestaurantBudget
         })
        
-
-        // console.log(JSON.stringify(auditList) + " BUY ACTION")
-    } 
-    else if (parsedInputData[i].action === 'Order'){
-
-    let res = getOrderAction(data, ingredientsPrices, newRestaurantBudget, newParsedWarehouseStock)
-
-    // auditList.push(res)
-    console.log(res)
-    // resultData.push(res.listResult)
+    } else if (parsedInputData[i].action === 'Order'){
+    let res = getOrderAction(data, ingredientsPrices, newRestaurantBudget, ...newParsedWarehouseStock)
+    resultData.push(res.listResult)
     newRestaurantBudget = res.newRestaurantBudget
-    newParsedWarehouseStock = res.newParsedWarehouseStock
-    // auditList.push({
-    //   comand: res.listResult + "-> success",
-    //   Warehouse: newParsedWarehouseStock,
-    //   Budget: newRestaurantBudget
-    // })
+    auditList.push({
+      comand: res.resultOfOrder + "-> success",
+      Warehouse: res.warehous,
+      Budget: newRestaurantBudget,
+    })
     } 
     else if (parsedInputData[i].action === 'Audit'){
       let res = getAuditAction(auditList)
-      console.log(res)
-
+     
       auditResult.push(res)
-
       }
       
     else resultData.push("RESTAURANT BANKRUPT")
