@@ -1,3 +1,4 @@
+
 const getCustomerAllergieProduct = (data, customer) => { 
     if(customer !== "") return data.find(({customer}) => customer === customer).product.split(", ");
   };

@@ -1,11 +1,37 @@
 const fs = require("fs");
 
+// import { getData } from './helpers/exportClass.js'
+
+const getData  = require("./helpers/exportClass")
+const getDataFromCsv  = require("./helpers/getDataFromCsvFile")
+const getCustomersDatas = require("./dataHandlers/customersData")
+
+
+
+// getData.getDataFromFile("command.json")
+// getData.getDataFromFile("InputData.txt")
+
+// const orderedProducts = getData.getDataFromFile("Warehouse.txt")
+// console.log(orderedProducts)
+
+
+
+// import {getData} from './dataHandlers/classHelpers'
+
+// getData.getDataFromFile();
+
+// const {DataReceiver} = require ('./dataHandlers/classHelpers')
+
+// new DataReceiver().sayHi();
+
+
 const {
     getBaseIngredientsList,
     getFoodIngredientsList,
     getCustomerAllergieProductsList,
     getBaseIngredientsPricesList,
     getCustomersBudgetsList,
+    getCommandsList
 } = require("./helpers/getData")
 
 const {
@@ -16,47 +42,75 @@ const {
   getAuditAction
   } = require("./helpers/actionFunctions.js")
 
-  const {
+const {
     getParseCustomersAllergiesProducts,
     getParsedCustomersBudgets
   } = require("./dataHandlers/handleCustomersData")
 
-  const {
+const {
     getFoodIngredients,
   } = require("./dataHandlers/handleDishData")
 
-  const {
+const {
     getBaseIngridientsOfOrder,
   } = require("./dataHandlers/handleOrderData")
 
-  const {
+const {
     getParseInputData,
   } = require("./dataHandlers/handleInputData")
 
-  const {
+const {
     getParseWarehousData,
     getWarehousStockAfterOrder
   } = require("./dataHandlers/handleWarehousData")
 
 const {
   sendReadedData,
-} = require("./services/dataFromFile.js")
+} = require("./services/dataFromInputFile.js")
 
 const {
   sendReadedDataFromWarehouse,
-} = require("./services/dataFromTxtFile.js")
+} = require("./services/dataFromWarehouseFile.js")
+
+// const {
+//   getDataFromJsonFile,
+// } = require("./services/dataFromJsonFile");
+// const { get } = require("http");
 
 
-const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
+const res =  async (sendReadedData,sendReadedDataFromWarehouse) => {
+
+  const allergiData = await getData.getDataFromFile("RegularCustomersAllergies.csv")
+  // console.log(allergiData)
+  const warehousData = await getData.getDataFromFile("Warehouse.txt")
+  const comandList = await getData.getDataFromFile("command.json")
+  const custommersAllergis = await getDataFromCsv.getDataFromFile("RegularCustomersAllergies.csv")
+  
+
+  // const custommersAllergiList = getCustomersDatas.getParseAllergiesData(allergiData)
+  // console.log(custommersAllergiList)
+  
+
+  // console.log(d)
+
+  // console.log(warehousData)
+  // getData.getDataFromFile("command.json")
+  // getData.getDataFromFile("InputData.txt")
+  // getData.getDataFromFile("Warehouse.txt")
+
+  // const orderedProducts = getData.getDataFromFile("InputData.txt")
 
 
 
-
+  // const comandList = await getDataFromJsonFile()
+  // console.log(comandList)
   const ordersList = await sendReadedData()
 
-  const warehousData = await sendReadedDataFromWarehouse()
+
+  // const warehousData = await sendReadedDataFromWarehouse()
 
   const parsedInputData = getParseInputData(ordersList)
+
   const parsedWarehouseStock = getParseWarehousData(warehousData)
 
   
@@ -78,10 +132,15 @@ const res = async (sendReadedData,sendReadedDataFromWarehouse) => {
     const baseIngredients = await getBaseIngredientsList()
   
     const customerAllergieProducts = await getCustomerAllergieProductsList(customer)
+  
    
     const ingredientsPrices = await getBaseIngredientsPricesList()
   
     const customersBudgets = await getCustomersBudgetsList()
+
+    
+
+ 
 
 
     const parsedCustomersAllergiesProducts = getParseCustomersAllergiesProducts(customerAllergieProducts)
