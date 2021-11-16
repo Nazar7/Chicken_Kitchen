@@ -1,4 +1,5 @@
 Restaurant budget: 500
-Buy,Alexandra Smith,Fries -> Alexandra Smith, 80, Fries, 3 -> seccess
-
-Restaurant budget: 473.9
+Buy command disabled
+Order, Potatoes, 10
+Audit command disabled
+Restaurant budget: 470

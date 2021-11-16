@@ -1,75 +1,50 @@
-const {
-    parseBaseIngridients,
-    getAllDishIngridients,
-  } = require("../dataHandlers/handleDishData");
+  const getOrderData = require("../dataHandlers/handleOrderDataClass")
 
-  const {
-    getOrderPrice,
-  } = require("../dataHandlers/handleOrderData");
+  const getDishData = require("../dataHandlers/handleDishDataClass")
 
-  const {
-    getCustomerAllergieProduct,
-    checkAllergiExist,
-    getParseCustomersAllergiesProducts
-  } = require("../dataHandlers/handleCustomersData");
+  const getCustomersDatas = require("../dataHandlers/handleCustomersDataClass")
+
+
 
 
  const getBuyAction =  (
+  resultAllDatas,
   data,
-        i,
-        orderr,
-        getFoodIngredients,
-        foodIngredients,
-        baseIngredients,
-        customersBudgets,
-        ingredientsPrices,
-        getBaseIngridientsOfOrder,
-        newRestaurantBudget,
-        customerAllergieProducts,
-        newParsedWarehouseStock
+  i,
+  order,
+  customer,
+  newRestaurantBudget,
+  ...newParsedWarehouseStock
     ) => {
 
-
-      let parsefoodIngredients = parseBaseIngridients(foodIngredients)
-     
+    let parsefoodIngredients = getDishData.getParsedFoodIngredients(resultAllDatas.foodIngredients)
      ordersList = [data.action, data.arg, data.val]
-     let customer = ordersList[1][0]
-     let order = ordersList[2][0]
-
-    const customerBudget = parseInt(customersBudgets.find( ({ customer }) => customer === customer ).budget);
-    
- let customerAllergieProduct = getCustomerAllergieProduct(customerAllergieProducts, customer);
-
-    let orderIngridients = getBaseIngridientsOfOrder(order, foodIngredients, baseIngredients).split(", "); 
-    const customersAllergiesList = getParseCustomersAllergiesProducts(customerAllergieProducts)
-    const alergiExist =  checkAllergiExist(
+    const customerBudget = parseInt(resultAllDatas.customersBudgets.find( ({ customer }) => customer === customer ).budget);
+    let customerAllergieProduct = getCustomersDatas.getCustomerAllergieProduct(resultAllDatas.customerAllergieProducts, customer);
+    let orderIngridients = getOrderData.getBaseIngridientsOfOrder(order, parsefoodIngredients, resultAllDatas.baseIngredients).split(',');
+    const customersAllergiesList = getCustomersDatas.getParseCustomersAllergiesProducts(resultAllDatas.customerAllergieProducts)
+    const alergiExist =  getCustomersDatas.checkAllergiExist(
       orderIngridients, 
       customersAllergiesList, 
       customer, 
       order);
-
-    let orderPrice =  parseInt(getOrderPrice(orderIngridients, ingredientsPrices))
-
-    if (customerBudget > orderPrice && ordersList.length == 3 && alergiExist === "seccess") {
-            var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + orderPrice + " -> " + alergiExist;
+    let orderPrice =  parseInt(getOrderData.getOrderPrice(orderIngridients, resultAllDatas.ingredientsPrices))
+           if (customerBudget > orderPrice && ordersList.length == 3 && alergiExist === "seccess") {
+            let resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + orderPrice + " -> " + alergiExist;
             newRestaurantBudget += orderPrice * 1.3
-            let warehouseStock = getAllDishIngridients (order, parsefoodIngredients, baseIngredients, newParsedWarehouseStock)
+            let warehouseStock = getDishData.getAllDishIngridients(order, parsefoodIngredients, resultAllDatas.baseIngredients, resultAllDatas.parsedWarehouseStock)
             newParsedWarehouseStock = warehouseStock[0] 
             return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}};
           } else if (customerBudget < orderPrice) {
-            var resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + "XXX" + " -> " + "NOT INAF MONEY";
+            let resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + "XXX" + " -> " + "NOT INAF MONEY";
             return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}};
-          }else if (alergiExist !== "seccess") {
-            var resultOfOrder = alergiExist
-            // parsedWarehouseStock[orderName] = parseInt(parsedWarehouseStock[orderName]) - orderQuantity
-
-            // auditList.push({
-            //   comand: res.resultOfOrder,
-            //   Warehouse: newParsedWarehouseStock[0],
-            //   Budget: newRestaurantBudget
-            // })
+          } else if (alergiExist !== "seccess") {
+            let resultOfOrder = alergiExist
             return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}};
           }
+        
+
+        
 };
 
 
@@ -78,7 +53,6 @@ const getTableAction =  (
   data,
   i,
   orderr,
-  getFoodIngredients,
   foodIngredients,
   baseIngredients,
   customersBudgets,
@@ -127,37 +101,34 @@ const getTableAction =  (
 
 
 
-  const getOrderAction = (data, ingredientsPrices, newRestaurantBudget, newParsedWarehouseStock) => {
+  const getOrderAction = (resultAllDatas, data, newRestaurantBudget) => {
+    let warehousStock = resultAllDatas.parsedWarehouseStock
     let resultOfOrder = ""
     let orderAction = data.action;
     let orderName = data.arg[0]
     let orderQuantity = parseInt(data.val)
     let restaurantBudget = newRestaurantBudget
-    let parsIngredientsPrices = {};
-    for (element in ingredientsPrices) {
-      parsIngredientsPrices[ingredientsPrices[element].ingredients] =
-      parseInt(ingredientsPrices[element].price);
-    }
+   let parsedIngredientsPrices = getDishData.getParsedIngredientsPrices(resultAllDatas.ingredientsPrices)
 
-    for (const [key, value] of Object.entries(parsIngredientsPrices)) {
+    for (const [key, value] of Object.entries(parsedIngredientsPrices)) {
+
       if(orderName === key) {
         let ingridientPrice = parseInt(value)
        let resturanOrderPrice = orderQuantity * ingridientPrice
        let newRestaurantBudget = restaurantBudget - resturanOrderPrice;
-      if(newRestaurantBudget < 0){
+    if(newRestaurantBudget < 0){
          let message = "RESTAURANT BANKRUPT"
          return {message, newRestaurantBudget}
-         
-       } else if( orderName in newParsedWarehouseStock){
+       } else if(orderName in warehousStock){
         newRestaurantBudget = restaurantBudget - resturanOrderPrice;
-         newParsedWarehouseStock[orderName] = parseInt(newParsedWarehouseStock[orderName]) + orderQuantity
+        warehousStock[orderName] = parseInt(warehousStock[orderName]) + orderQuantity
          resultOfOrder = (orderAction + ", " + orderName + ", " + orderQuantity )
-          return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}}
+          return {resultOfOrder, newRestaurantBudget, warehous: {warehousStock}}
          } else
          newRestaurantBudget = restaurantBudget - resturanOrderPrice;
          newParsedWarehouseStock.orderName == orderQuantity
          resultOfOrder = (orderAction + ", " + orderName + ", " + orderQuantity)
-         return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}}
+         return {resultOfOrder, newRestaurantBudget, warehous: {warehousStock}}
       }
     }
     console.log("There is no such order in ingredient list")
