@@ -18,6 +18,8 @@ getParsedWarehousData(warehousData) {
     }
 }
 
+
+
     const getWarehousData = new WarehousData();
 
 module.exports = getWarehousData;

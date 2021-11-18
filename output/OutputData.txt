@@ -1,5 +1,2 @@
 Restaurant budget: 500
-Buy command disabled
-Order, Potatoes, 10
-Audit command disabled
-Restaurant budget: 470
+Restaurant budget: 500

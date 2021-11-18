@@ -14,6 +14,10 @@ class CustomersDatas {
     return parsBudget;
   }
 
+  getIndividualCustomerBudget(customer){
+    parseInt(getCustomersBudgets().find( ({ customer }) => customer === customer ).budget);
+  }
+
   getParseCustomersAllergiesProducts(customerAllergieProducts) {
     let customersAllergies = {};
     customerAllergieProducts.forEach((element, index) => {
@@ -24,7 +28,6 @@ class CustomersDatas {
   }
 
   checkAllergiExist(orderIngridients, customersAllergiesList, customer, order) {
-      console.log(orderIngridients)
     let data = "";
     let exist = false;
     if (customer in customersAllergiesList) {

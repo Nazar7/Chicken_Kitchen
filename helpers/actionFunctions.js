@@ -8,7 +8,7 @@
 
 
  const getBuyAction =  (
-  resultAllDatas,
+  datasFromFiles,
   data,
   i,
   order,
@@ -17,22 +17,22 @@
   ...newParsedWarehouseStock
     ) => {
 
-    let parsefoodIngredients = getDishData.getParsedFoodIngredients(resultAllDatas.foodIngredients)
+    let parsefoodIngredients = getDishData.getParsedFoodIngredients(datasFromFiles.foodIngredients)
      ordersList = [data.action, data.arg, data.val]
-    const customerBudget = parseInt(resultAllDatas.customersBudgets.find( ({ customer }) => customer === customer ).budget);
-    let customerAllergieProduct = getCustomersDatas.getCustomerAllergieProduct(resultAllDatas.customerAllergieProducts, customer);
-    let orderIngridients = getOrderData.getBaseIngridientsOfOrder(order, parsefoodIngredients, resultAllDatas.baseIngredients).split(',');
-    const customersAllergiesList = getCustomersDatas.getParseCustomersAllergiesProducts(resultAllDatas.customerAllergieProducts)
+    const customerBudget = parseInt(datasFromFiles.customersBudgets.find( ({ customer }) => customer === customer ).budget);
+    let customerAllergieProduct = getCustomersDatas.getCustomerAllergieProduct(datasFromFiles.customerAllergieProducts, customer);
+    let orderIngridients = getOrderData.getBaseIngridientsOfOrder(order, parsefoodIngredients, datasFromFiles.baseIngredients).split(',');
+    const customersAllergiesList = getCustomersDatas.getParseCustomersAllergiesProducts(datasFromFiles.customerAllergieProducts)
     const alergiExist =  getCustomersDatas.checkAllergiExist(
       orderIngridients, 
       customersAllergiesList, 
       customer, 
       order);
-    let orderPrice =  parseInt(getOrderData.getOrderPrice(orderIngridients, resultAllDatas.ingredientsPrices))
+    let orderPrice =  parseInt(getOrderData.getOrderPrice(orderIngridients, datasFromFiles.ingredientsPrices))
            if (customerBudget > orderPrice && ordersList.length == 3 && alergiExist === "seccess") {
             let resultOfOrder = ordersList + " -> " + customer + ", " + customerBudget + ", " + order + ", " + orderPrice + " -> " + alergiExist;
             newRestaurantBudget += orderPrice * 1.3
-            let warehouseStock = getDishData.getAllDishIngridients(order, parsefoodIngredients, resultAllDatas.baseIngredients, resultAllDatas.parsedWarehouseStock)
+            let warehouseStock = getDishData.getAllDishIngridients(order, parsefoodIngredients, datasFromFiles.baseIngredients, datasFromFiles.parsedWarehouseStock)
             newParsedWarehouseStock = warehouseStock[0] 
             return {resultOfOrder, newRestaurantBudget, warehous: {...newParsedWarehouseStock}};
           } else if (customerBudget < orderPrice) {
@@ -101,14 +101,14 @@ const getTableAction =  (
 
 
 
-  const getOrderAction = (resultAllDatas, data, newRestaurantBudget) => {
-    let warehousStock = resultAllDatas.parsedWarehouseStock
+  const getOrderAction = (datasFromFiles, data, newRestaurantBudget) => {
+    let warehousStock = datasFromFiles.parsedWarehouseStock
     let resultOfOrder = ""
     let orderAction = data.action;
     let orderName = data.arg[0]
     let orderQuantity = parseInt(data.val)
     let restaurantBudget = newRestaurantBudget
-   let parsedIngredientsPrices = getDishData.getParsedIngredientsPrices(resultAllDatas.ingredientsPrices)
+   let parsedIngredientsPrices = getDishData.getParsedIngredientsPrices(datasFromFiles.ingredientsPrices)
 
     for (const [key, value] of Object.entries(parsedIngredientsPrices)) {
 
