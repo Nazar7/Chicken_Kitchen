@@ -3,14 +3,20 @@ const fs = require("fs");
 
 const resultHandleDatas = require('./dataHandlers/handleIAllDatasFromFiles.js');
 
-const getWarehousData = require('./dataHandlers/warehousDataCalculation.js')
-getWarehousData.getParsedWarehousData(resultHandleDatas)
+const WarehousDataParse = require('./dataHandlers/warehousDataParser.js')
+const DishDataParse = require('./dataHandlers/dishDataParser.js')
+const CustomerDataParse = require('./dataHandlers/customersDataParser.js')
+const DishIngredients = require('./dataHandlers/dishIngredientsStorage.js')
+const CustomerData = require('./dataHandlers/customerDataStorage.js')
+const OrderAllergiExist = require('./dataHandlers/orderAllergieExist.js')
+
 
 
 const getData  = require("./services/getDataFromFile")
 const getDataFromCsv  = require("./services/getDataFromCsvFile")
 const getBuyActions  = require("./helpers/actionClass")
 const getOrderActions  = require("./helpers/actionClass")
+
 
 // const getParsedInputData = require("./dataHandlers/handleInputDataClass")
 
@@ -24,32 +30,58 @@ const {
   } = require("./helpers/actionFunctions.js")
 
 const res =  async () => {
-
- 
-
   const datasFromFiles = await resultHandleDatas()
+
+
+
+
   let restaurantBudget = 500;
   var resultData = [];
   resultData.push("Restaurant budget: " + restaurantBudget);
   let newRestaurantBudget = restaurantBudget;
   let auditList = []
   let auditResult = []
-  for (let i = 0; i <= datasFromFiles.parsedInputData.length-1; i++) {
+  // for (let i = 0; i <= datasFromFiles.parsedInputData.length-1; i++) {
+    for (let i = 0; i <= 1; i++) {
     let data = datasFromFiles.parsedInputData[i]
     let customer = "";
     let order = "";
     let commands = JSON.parse(datasFromFiles.commandList)
     let commandActivity = commands[Object.keys(commands).find(key => key.toLowerCase() === data.action.toLowerCase())]
-    customer = datasFromFiles.parsedInputData[i].arg[0]
-    order = datasFromFiles.parsedInputData[i].val[0]
+    console.log(data)
+    customer = data.arg[0]
+    order = data.val[0]
+    console.log(datasFromFiles.parsedInputData[i])
+  
 
-    console.log("OKKKKKOKOKOKOKOKOK")
-getWarehousData.subtractWarehousQuontity(datasFromFiles)
+    const ParsedWarehousData = new WarehousDataParse(datasFromFiles);
+    const ParsedDishData = new DishDataParse(datasFromFiles)
+    const ParsedCustomerData = new CustomerDataParse(datasFromFiles)
+
+    const OrderIngredients = new DishIngredients(order, datasFromFiles, ParsedDishData.parsedFoodIngredients())
+    const CustomerAllergiProducts = new CustomerData(ParsedCustomerData.parsedCustomersAllergiesProducts(), customer)
+    const CustomerBudget =  new CustomerData(ParsedCustomerData.parsedCustomersAllergiesProducts(), ParsedCustomerData.parsedCustomersBudgets(), customer)
+    const CustomerAllergiExist = new OrderAllergiExist(order, customer, OrderIngredients.getBaseIngridientsOfOrder(), CustomerAllergiProducts.getCustomerAllergieProduct())
+    
+    
+    ParsedWarehousData.parsedWarehousData()
+    ParsedDishData.parsedFoodIngredients()
+    
+    ParsedCustomerData.parsedCustomersAllergiesProducts()
+    
+ ParsedCustomerData.parsedCustomersBudgets()
  
-    getBuyActions.buyActionResult(datasFromFiles, data, customer, order)
+    OrderIngredients.getBaseIngridientsOfOrder()
+    
+CustomerAllergiProducts.getCustomerAllergieProduct()
+CustomerBudget.getCustomerBudget()
+CustomerAllergiExist.getOrderAllergiExist()
+break
+ 
+    // getBuyActions.buyActionResult(datasFromFiles, data, customer, order)
     // getOrderActions.orderActionResult(datasFromFiles, data, customer, order)
     // console.log(getBuyActions.buyActionResult(datasFromFiles, data, customer, order))
- break
+
     // let datassss = getActions.consol(datasFromFiles, customer)
 
     if (commandActivity !== "yes"){

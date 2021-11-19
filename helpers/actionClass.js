@@ -37,8 +37,6 @@ class Actions {
         let orderQuantity = parseInt(data.val)
         let restaurantBudget = this.newRestaurantBudget
         let parsedIngredientsPrices = getDishData.getParsedIngredientsPrices(datasFromFiles.ingredientsPrices)
-        
-       
     }
 
 }
