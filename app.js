@@ -3,12 +3,16 @@ const fs = require("fs");
 
 const resultHandleDatas = require('./dataHandlers/handleIAllDatasFromFiles.js');
 
-const WarehousDataParse = require('./dataHandlers/warehousDataParser.js')
+const InputDataParse = require('./dataHandlers/inputDataParser.js')
+const WarehouseDataParse = require('./dataHandlers/warehousDataParser.js')
+const WarehousCalculation = require('./dataHandlers/warehousCalculation.js')
+const IngridientsPricesDataParse = require('./dataHandlers/ingridientsPricesParser.js')
 const DishDataParse = require('./dataHandlers/dishDataParser.js')
 const CustomerDataParse = require('./dataHandlers/customersDataParser.js')
-const DishIngredients = require('./dataHandlers/dishIngredientsStorage.js')
+const DishIngredients = require('./dataHandlers/orderDataStorage.js')
 const CustomerData = require('./dataHandlers/customerDataStorage.js')
 const OrderAllergiExist = require('./dataHandlers/orderAllergieExist.js')
+const ActionBuy = require('./helpers/actionClass.js')
 
 
 
@@ -42,40 +46,78 @@ const res =  async () => {
   let auditList = []
   let auditResult = []
   // for (let i = 0; i <= datasFromFiles.parsedInputData.length-1; i++) {
-    for (let i = 0; i <= 1; i++) {
-    let data = datasFromFiles.parsedInputData[i]
+    // for (let i = 0; i <= 1; i++) {
+
+    // let data = datasFromFiles.inputData
+    // console.log(data)
     let customer = "";
     let order = "";
-    let commands = JSON.parse(datasFromFiles.commandList)
-    let commandActivity = commands[Object.keys(commands).find(key => key.toLowerCase() === data.action.toLowerCase())]
-    console.log(data)
-    customer = data.arg[0]
-    order = data.val[0]
-    console.log(datasFromFiles.parsedInputData[i])
+    // let commands = JSON.parse(datasFromFiles.commandList)
+    // let commandActivity = commands[Object.keys(commands).find(key => key.toLowerCase() === data.action.toLowerCase())]
+    // // console.log(data)
+    // customer = data.arg[0]
+    // // console.log(customer)
+    // order = data.val[0]
+    // // console.log(order)
+
+    // // console.log(datasFromFiles.parsedInputData[i])
   
 
-    const ParsedWarehousData = new WarehousDataParse(datasFromFiles);
+    const ParsedInputData = new InputDataParse(datasFromFiles); 
+    const ParsedIngridientsPricesData = new IngridientsPricesDataParse(datasFromFiles)
+    const ParsedWarehouseData = new WarehouseDataParse(datasFromFiles);
     const ParsedDishData = new DishDataParse(datasFromFiles)
     const ParsedCustomerData = new CustomerDataParse(datasFromFiles)
 
-    const OrderIngredients = new DishIngredients(order, datasFromFiles, ParsedDishData.parsedFoodIngredients())
-    const CustomerAllergiProducts = new CustomerData(ParsedCustomerData.parsedCustomersAllergiesProducts(), customer)
+   let dataList = ParsedInputData.parsedInputData()
+   let warehouseData = ParsedWarehouseData.parsedWarehousData()
+
+    for (let i = 2; i <= 3; i++) {
+      let data = dataList[i]
+      console.log(data)
+   let customer = (data.arg)
+    // console.log(customer)
+   let order = data.val
+    // console.log(order)
+
+    
+
+    const OrderIngredients = new DishIngredients(order, datasFromFiles, ParsedDishData.parsedDishIngredients(), ParsedIngridientsPricesData.parsedIngridientsPrices())
+    const CustomerAllergiProducts = new CustomerData(ParsedCustomerData.parsedCustomersAllergiesProducts(), ParsedCustomerData.parsedCustomersBudgets(), customer)
     const CustomerBudget =  new CustomerData(ParsedCustomerData.parsedCustomersAllergiesProducts(), ParsedCustomerData.parsedCustomersBudgets(), customer)
     const CustomerAllergiExist = new OrderAllergiExist(order, customer, OrderIngredients.getBaseIngridientsOfOrder(), CustomerAllergiProducts.getCustomerAllergieProduct())
+    const WarehousStock = new WarehousCalculation(order, warehouseData, OrderIngredients.getBaseIngridientsOfOrder())
+    WarehousStock.warehousDecrease()
+
+    const BuyAction = new ActionBuy(
+      restaurantBudget, 
+      data, 
+      order, 
+      customer, 
+      CustomerBudget.getCustomerBudget(), 
+      OrderIngredients.getOrderPrice(), 
+      CustomerAllergiExist.getOrderAllergiExist(),
+      warehouseData
+      )
+
+      BuyAction.getBuyAction()
+      BuyAction.getOrderAction()
     
+
+  // }
+  // OrderIngredients.getOrderPrice()
+    // ParsedWarehousData.parsedWarehousData()
+    // ParsedDishData.parsedDishIngredients()
     
-    ParsedWarehousData.parsedWarehousData()
-    ParsedDishData.parsedFoodIngredients()
+//     ParsedCustomerData.parsedCustomersAllergiesProducts()
     
-    ParsedCustomerData.parsedCustomersAllergiesProducts()
-    
- ParsedCustomerData.parsedCustomersBudgets()
+//  ParsedCustomerData.parsedCustomersBudgets()
  
-    OrderIngredients.getBaseIngridientsOfOrder()
+//     OrderIngredients.getBaseIngridientsOfOrder()
     
-CustomerAllergiProducts.getCustomerAllergieProduct()
-CustomerBudget.getCustomerBudget()
-CustomerAllergiExist.getOrderAllergiExist()
+// CustomerAllergiProducts.getCustomerAllergieProduct()
+// CustomerBudget.getCustomerBudget()
+// CustomerAllergiExist.getOrderAllergiExist()
 break
  
     // getBuyActions.buyActionResult(datasFromFiles, data, customer, order)

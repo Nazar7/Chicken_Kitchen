@@ -3,7 +3,7 @@ module.exports = class DishDataParse {
     constructor(data) {
         this.data = data.foodIngredients;
       }
-    parsedFoodIngredients () {
+    parsedDishIngredients () {
         let parsedData = {};
         for (let element in this.data) {
           parsedData[this.data[element].food] =

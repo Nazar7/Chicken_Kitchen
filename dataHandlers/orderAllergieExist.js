@@ -8,11 +8,13 @@ module.exports = class OrderAllergiExist{
 getOrderAllergiExist() {
     let data = "";
     let exist = false;
-    console.log(this.order)
-    console.log(this.customer)
-    console.log(this.baseIngridientsOfOrder.split(", "))
-    console.log(this.customerAllergieProduct)
-      const found = this.baseIngridientsOfOrder.split(", ").some((element) =>
+    // console.log(this.order)
+    // console.log(this.customer)
+    console.log(this.baseIngridientsOfOrder)
+    let item = this.baseIngridientsOfOrder
+    // console.log(item.split(''))
+    // console.log(this.customerAllergieProduct)
+      const found = this.baseIngridientsOfOrder.some((element) =>
       this.customerAllergieProduct.includes(element)
       
       );

@@ -10,7 +10,7 @@ const resulted = async () => {
   const profitAndTaxList = await getData.getDataFromFile("./data/profitAndTaxFile.json");
 
 
-  const parsedInputData = await getData.getDataFromInputFile(
+  const inputData = await getData.getDataFromInputFile(
     "./input/inputData.txt"
   );
 
@@ -48,7 +48,7 @@ const resulted = async () => {
   return (dataList = {
     warehousData,
     commandList,
-    parsedInputData,
+    inputData,
     custommersAllergis,
     foodIngredients,
     baseIngredients,

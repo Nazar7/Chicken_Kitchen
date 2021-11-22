@@ -8,12 +8,13 @@ module.exports = class CustomerData{
 
     getCustomerAllergieProduct() {
         let customerProductAllergi = []
-        if (this.customer in this.allergiesList && this.allergiesList[this.customer] !== ''){
-             customerProductAllergi.push(this.allergiesList[this.customer])
-             return customerProductAllergi.toString().split(", ")
+        if (this.customer in this.allergiesList && this.allergiesList[this.customer] === ''){
+          customerProductAllergi.push(this.allergiesList[this.customer])
+          return customerProductAllergi.toString().split(", ")   
         } else
-         console.log(this.customer + " doesnt exist in list of CustomersAllergies or doesnt have allergi for any product")
-         return customerProductAllergi
+        console.log(this.customer + " doesnt exist in list of CustomersAllergies or doesnt have allergi for any product")
+          return customerProductAllergi 
+       
       }
 
       getCustomerBudget(){

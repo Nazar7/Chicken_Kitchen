@@ -1,3 +1,4 @@
-Buy, Alexandra Smith, Fries
-Order, Potatoes, 10
+Buy, Alexandra Smith, Ruby Salad
+Table, Adam Smith, Julie Mirage, Princess Chicken, Ruby Salad
+Order, Potatoes, 10, Chicken, 2
 Audit, Resources
