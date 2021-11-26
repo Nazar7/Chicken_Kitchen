@@ -87,7 +87,7 @@ const PROFIT_TAX_LIST = JSON.parse(datasFromFiles.profitAndTaxList)
     ParsedCustomerData,
     PROFIT_TAX_LIST,
     restaurantBudget,
-    {...warehouseStock}, 
+    warehouseStock
     )
     let actionResultsObjact = []
     for (let i = 0; i <= dataList.length-1; i++) {

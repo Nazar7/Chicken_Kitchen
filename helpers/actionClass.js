@@ -11,7 +11,7 @@ module.exports = class Action {
     ParsedCustomerData,
     PROFIT_TAX_LIST,
     restaurantBudget,
-    ...warehouseStock
+    warehouseStock
   ) {
     this.baseIngridients = BASE_INGREDIENTS_LIST;
     this.parsedIngridientsPricesData = ParsedIngridientsPricesData;
@@ -19,12 +19,15 @@ module.exports = class Action {
     this.ParsedCustomerData = ParsedCustomerData;
     this.profitandtaxobjact = PROFIT_TAX_LIST;
     this.restaurantBudget = restaurantBudget;
-    this.warehouseStock = { ...warehouseStock[0] };
+    this.warehouseStock = {...warehouseStock};
     this.amountOfTableOrder = 0;
     this.tableOrderResult = [];
+    this.baseRestaurantBudget = restaurantBudget;
+    this.baseWarehouseStock = warehouseStock;
   }
 
   loadBuyAction(data) {
+  
     // console.log(data);
     let expectedData = data.action + ", " + data.arg + ", " + data.val;
     for (let item = 0; item <= data.arg.length - 1; item++) {
@@ -73,36 +76,48 @@ module.exports = class Action {
 
   loadOrderAction(data) {
     let ordersList = [data.action, data.arg, data.val];
-    for (let item = 1; item <= ordersList.length - 1; item++) {
+    for (let item = 1; item <= ordersList.length-1; item++) {
       let ingridientName = ordersList[item][0];
       let ingridientQuantity = ordersList[item][1];
       // let customer = data.arg[item];
       // let customerName = data.arg[item].split(" ")[0];
       // let dishObject = new Dish(dish, this.baseIngridients, this.parsedDishData, this.parsedIngridientsPricesData);
-      for (const [key, value] of Object.entries(
-        this.parsedIngridientsPricesData.parsedIngridientsPrices()
-      )) {
+      for (const [key, value] of Object.entries(this.parsedIngridientsPricesData.parsedIngridientsPrices())) {
+        console.log( this.restaurantBudget)
         if (ingridientName === key) {
           let ingridientPrice = parseInt(value);
           let costOfOrderedIngredient = ingridientQuantity * ingridientPrice;
           this.restaurantBudget = this.restaurantBudget - costOfOrderedIngredient;
           this.warehouseStock[ingridientName] = +this.warehouseStock[ingridientName] + +ingridientQuantity;
           // return {warehousStock: this.warehouseStock, restaurantBudget: this.restaurantBudget}
-          if (this.restaurantBudget < 0) {
-            let message = "RESTAURANT BANKRUPT";
-            return { message, newRestaurantBudget };
-          } else {
-            // console.log(this.warehouseStock);
-            // console.log(this.restaurantBudget);
-            return {
-              warehousStock: {...this.warehouseStock},
-              restaurantBudget: this.restaurantBudget,
-            };
-          }
+         
         }
+         else 
+          this.warehouseStock[ingridientName] = ingridientQuantity;
+          let ingridientPrice = parseInt(value);
+          let costOfOrderedIngredient = ingridientQuantity * ingridientPrice;
+          this.restaurantBudget = this.restaurantBudget - costOfOrderedIngredient;
+         
+        
+        
         // let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
+      
+      } if (this.restaurantBudget < 0) {
+        console.log(this.warehouseStock)
+        let message = "RESTAURANT BANKRUPT";
+        return { message, restaurantBudget: this.restaurantBudget, };
+      } else {
+
+        // console.log(this.warehouseStock);
+        // console.log(this.restaurantBudget);
+      
       }
     }
+    console.log(this.warehouseStock)
+      return {
+          warehousStock: {...this.warehouseStock},
+          restaurantBudget: this.restaurantBudget,
+        };
   }
 
   loadBudgetAction(data) {
@@ -119,9 +134,11 @@ module.exports = class Action {
 
   loadAuditAction(data, actionResultsObjact) {
     let ordersList = [data.action, data.arg, data.val];
-    // console.log(data)
-    console.log(actionResultsObjact)
-      if (data.arg === "Resources") {
+    console.log(data)
+      if (data.val[0] === "Resources") {
+        console.log('INIT')
+        console.log(this.baseWarehouseStock)
+        console.log(this.baseRestaurantBudget)
         console.log(actionResultsObjact)
       }
   }
