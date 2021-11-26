@@ -1,4 +1,4 @@
-Buy, Alexandra Smith, Ruby Salad
+Budget, =, 300
 Table, Adam Smith, Julie Mirage, Princess Chicken, Ruby Salad
-Order, Potatoes, 10, Chicken, 2
+Order, Potatoes, 10, Chicken, 5
 Audit, Resources

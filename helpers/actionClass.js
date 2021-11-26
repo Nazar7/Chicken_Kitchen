@@ -1,76 +1,128 @@
-module.exports = class ActionBuy {
-  constructor(restaurantBudget, data, order, customer, cstomerBudget, orderPrice, allergieExist, warehousData) {
-      this.restaurantBudget = restaurantBudget;
-      this.data = data;
-      this.order = order;
-      this.customer = customer;
-      this.customerBudget = cstomerBudget;
-      this.orderPrice = orderPrice;
-      this.allergieExist = allergieExist;
-      this.warehousData = warehousData
-    }
+const Dish = require("../dataHandlers/dish.js");
+const Customer = require("../dataHandlers/customer.js");
+const Allergie = require("../dataHandlers/allergie.js");
+const WarehousCalculation = require("../dataHandlers/warehousCalculation.js");
 
-    getBuyAction(){
-      let ordersList = [this.data.action, this.data.arg, this.data.val]
-      if (this.customerBudget > this.orderPrice && this.allergieExist === "seccess") {
-        let resultOfOrder = ordersList + " -> " + this.customer + ", " + this.customerBudget + ", " + this.order + ", " + this.orderPrice + " -> " + this.allergieExist;
-        // console.log(resultOfOrder)
-        this.restaurantBudget += this.orderPrice * 1.3
-        // console.log(this.restaurantBudget)
-        // console.log(this.warehousData)
-        // let warehouseStock = getDishData.getAllDishIngridients(order, parsefoodIngredients, datasFromFiles.baseIngredients, datasFromFiles.parsedWarehouseStock)
-        // newParsedWarehouseStock = warehouseStock[0] 
-        return {resultOfOrder, restaurantBudget: this.restaurantBudget, warehous: this.warehousData};
-      } else if (customerBudget < orderPrice) {
-        let resultOfOrder = ordersList + " -> " + this.customer + ", " + this.customerBudget + ", " + this.order + ", " + "XXX" + " -> " + "NOT INAF MONEY";
-        return {resultOfOrder, restaurantBudget: this.restaurantBudget, warehous: this.warehousData};
-      } else if (this.alergiExist !== "seccess") {
-        let resultOfOrder = this.alergiExist
-          return {resultOfOrder, restaurantBudget: this.restaurantBudget, warehous: this.warehousData};
+module.exports = class Action {
+  constructor(
+    BASE_INGREDIENTS_LIST,
+    ParsedIngridientsPricesData,
+    ParsedDishData,
+    ParsedCustomerData,
+    PROFIT_TAX_LIST,
+    restaurantBudget,
+    ...warehouseStock
+  ) {
+    this.baseIngridients = BASE_INGREDIENTS_LIST;
+    this.parsedIngridientsPricesData = ParsedIngridientsPricesData;
+    this.parsedDishData = ParsedDishData;
+    this.ParsedCustomerData = ParsedCustomerData;
+    this.profitandtaxobjact = PROFIT_TAX_LIST;
+    this.restaurantBudget = restaurantBudget;
+    this.warehouseStock = { ...warehouseStock[0] };
+    this.amountOfTableOrder = 0;
+    this.tableOrderResult = [];
+  }
+
+  loadBuyAction(data) {
+    // console.log(data);
+    let expectedData = data.action + ", " + data.arg + ", " + data.val;
+    for (let item = 0; item <= data.arg.length - 1; item++) {
+      let dish = data.val[item];
+      let customer = data.arg[item];
+      let customerName = data.arg[item].split(" ")[0];
+      let dishObject = new Dish(
+        dish,
+        this.baseIngridients,
+        this.parsedDishData,
+        this.parsedIngridientsPricesData
+      );
+      let customerObject = new Customer(this.ParsedCustomerData, customer);
+      let allergieObjact = new Allergie(dish, customer, dishObject.getBaseIngridientsOfDish(), customerObject.loadCustomerAllergieProduct());
+      let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
+      if (
+        customerObject.loadCustomerBudget() > dishObject.loadDishPrice() &&
+        allergieObjact.checkerAllergie() === "seccess"
+      ) {
+        let newRestaurantBudget = this.restaurantBudget + (dishObject.loadDishPrice() * (100 + this.profitandtaxobjact["profit margin"])) / 100;
+        this.amountOfTableOrder += dishObject.loadDishPrice();
+        this.restaurantBudget = newRestaurantBudget;
+        this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock);
+        let individualCustomerResult = customer + ", " + customerObject.loadCustomerBudget() + ", " + dish + ", " + dishObject.loadDishPrice();
+        this.tableOrderResult.push(individualCustomerResult);
+      } else if (allergieObjact.checkerAllergie() !== "seccess") {
+        let result = expectedData + " -> " + customerName + ", " + customerObject.loadCustomerBudget() + dish + ", " + dishObject.loadDishPrice() + " -> can’t buy, cannot afford it.";
+        return { resultOfOrder: result };
+      } else if (customerObject.loadCustomerBudget() < dishObject.loadDishPrice()) {
+        let result = expectedData + " -> " + customerName + ", " + customerObject.loadCustomerBudget() + dish + ", XXX -> can’t buy, allergic to " +
+          customerObject.loadCustomerAllergieProduct();
+        return { resultOfOrder: result };
+      }
+      if (item === data.arg.length - 1) {
+        let result = expectedData + " -> " + "seccess; " + "money amount: " + this.amountOfTableOrder;
+        let resObg = customer + ", " + customerObject.loadCustomerBudget() + ", " + dishObject.loadDishPrice();
+        return {
+          resultOfOrder: result,
+          objactResult: this.tableOrderResult,
+          warehousStock: {...this.warehouseStock},
+          restaurantBudget: this.restaurantBudget,
+        };
       }
     }
+  }
 
-    getBudgetAction(){
-      let ordersList = [this.data.action, this.data.arg, this.data.val]
-      if (this.data.arg === "=" ) {
-        this.restaurantBudget == this.data.val
-      } else if (this.data.arg === "+") {
-        this.restaurantBudget += this.data.val
-      } else if (this.data.arg === "-") {
-        this.restaurantBudget -= this.data.val
-      }
-      return {restaurantBudget: this.restaurantBudget}
-    }
-
-    getOrderAction(){
-      let ordersList = [this.data.action, this.data.arg, this.data.val]
-     console.log(this.warehousData)
-
-     
-    for (const [key, value] of Object.entries(parsedIngredientsPrices)) {
-
-      if(orderName === key) {
-        let ingridientPrice = parseInt(value)
-       let resturanOrderPrice = orderQuantity * ingridientPrice
-       let newRestaurantBudget = restaurantBudget - resturanOrderPrice;
-    if(newRestaurantBudget < 0){
-         let message = "RESTAURANT BANKRUPT"
-         return {message, newRestaurantBudget}
-       } else if(orderName in warehousStock){
-        newRestaurantBudget = restaurantBudget - resturanOrderPrice;
-        warehousStock[orderName] = parseInt(warehousStock[orderName]) + orderQuantity
-         resultOfOrder = (orderAction + ", " + orderName + ", " + orderQuantity )
-          return {resultOfOrder, newRestaurantBudget, warehous: {warehousStock}}
-         } else
-         newRestaurantBudget = restaurantBudget - resturanOrderPrice;
-         newParsedWarehouseStock.orderName == orderQuantity
-         resultOfOrder = (orderAction + ", " + orderName + ", " + orderQuantity)
-         return {resultOfOrder, newRestaurantBudget, warehous: {warehousStock}}
+  loadOrderAction(data) {
+    let ordersList = [data.action, data.arg, data.val];
+    for (let item = 1; item <= ordersList.length - 1; item++) {
+      let ingridientName = ordersList[item][0];
+      let ingridientQuantity = ordersList[item][1];
+      // let customer = data.arg[item];
+      // let customerName = data.arg[item].split(" ")[0];
+      // let dishObject = new Dish(dish, this.baseIngridients, this.parsedDishData, this.parsedIngridientsPricesData);
+      for (const [key, value] of Object.entries(
+        this.parsedIngridientsPricesData.parsedIngridientsPrices()
+      )) {
+        if (ingridientName === key) {
+          let ingridientPrice = parseInt(value);
+          let costOfOrderedIngredient = ingridientQuantity * ingridientPrice;
+          this.restaurantBudget = this.restaurantBudget - costOfOrderedIngredient;
+          this.warehouseStock[ingridientName] = +this.warehouseStock[ingridientName] + +ingridientQuantity;
+          // return {warehousStock: this.warehouseStock, restaurantBudget: this.restaurantBudget}
+          if (this.restaurantBudget < 0) {
+            let message = "RESTAURANT BANKRUPT";
+            return { message, newRestaurantBudget };
+          } else {
+            // console.log(this.warehouseStock);
+            // console.log(this.restaurantBudget);
+            return {
+              warehousStock: {...this.warehouseStock},
+              restaurantBudget: this.restaurantBudget,
+            };
+          }
+        }
+        // let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
       }
     }
-    console.log("There is no such order in ingredient list")
-    
-      return {restaurantBudget: this.restaurantBudget}
-    }
+  }
 
-}
+  loadBudgetAction(data) {
+    let ordersList = [data.action, data.arg, data.val];
+      if (data.arg === "=") {
+        this.restaurantBudget = data.val;
+      } else if (data.arg === "+") {
+        this.restaurantBudget += data.val;
+      } else if (data.arg === "-") {
+        this.restaurantBudget -= data.val;
+      }
+      return { restaurantBudget: this.restaurantBudget };
+  }
+
+  loadAuditAction(data, actionResultsObjact) {
+    let ordersList = [data.action, data.arg, data.val];
+    // console.log(data)
+    console.log(actionResultsObjact)
+      if (data.arg === "Resources") {
+        console.log(actionResultsObjact)
+      }
+  }
+};

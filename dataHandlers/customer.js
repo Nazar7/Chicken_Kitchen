@@ -1,14 +1,15 @@
 
-module.exports = class CustomerData{
-    constructor(allergiList, budgetList, customer) {
-        this.allergiesList = allergiList;
-        this.budgetsList = budgetList
+module.exports = class Customer{
+    constructor(customerData, customer) {
+        this.allergiesList = customerData.parsedCustomersAllergiesProducts();
+        this.budgetsList = customerData.parsedCustomersBudgets()
         this.customer = customer;
+   
       }
 
-    getCustomerAllergieProduct() {
+    loadCustomerAllergieProduct() {
         let customerProductAllergi = []
-        if (this.customer in this.allergiesList && this.allergiesList[this.customer] === ''){
+        if (this.customer in this.allergiesList || this.allergiesList[this.customer] === ''){
           customerProductAllergi.push(this.allergiesList[this.customer])
           return customerProductAllergi.toString().split(", ")   
         } else
@@ -17,11 +18,10 @@ module.exports = class CustomerData{
        
       }
 
-      getCustomerBudget(){
+      loadCustomerBudget(){
           let customerBudget = ""
           if (this.customer in this.budgetsList && this.budgetsList[this.customer] !== ''){
             customerBudget = parseInt(this.budgetsList[this.customer])
-            console.log(customerBudget)
             return customerBudget
        } else
        return console.log(this.customer + " doesnt have money at all")
