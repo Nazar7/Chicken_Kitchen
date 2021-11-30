@@ -57,9 +57,9 @@ module.exports = class Action {
             let restaurantDiscoumt = 0.1
             // return restaurantTransactionTax = 0.1
           }
-            let restaurantTransactionTax = dishPriceForCustomer * (this.profitandtaxobjact["transaction tax"] / 100)
-            collectedTax += +parseFloat(restaurantTransactionTax).toPrecision(2);
-        let restaurantDiscoumt = dishPriceForCustomer * (this.profitandtaxobjact["every third discount"] / 100)
+            let restaurantTransactionTax = parseFloat((dishPriceForCustomer * (this.profitandtaxobjact["transaction tax"] / 100)).toFixed(2));
+            collectedTax += restaurantTransactionTax;
+        let restaurantDiscoumt = parseFloat((dishPriceForCustomer * (this.profitandtaxobjact["every third discount"] / 100)).toFixed(2));
         // return restaurantTransactionTax = restaurantProfit * (100 + this.profitandtaxobjact["transaction tax"]) / 100
             if(discountExist) {
               let individualCustomerOrderAmount = dishObject.loadDishPrice() - restaurantDiscoumt
@@ -68,7 +68,7 @@ module.exports = class Action {
         this.amountOfTableOrder += dishObject.loadDishPrice();
         let newRestaurantBudget = this.restaurantBudget + dishPriceForCustomer - restaurantTransactionTax;
         this.restaurantBudget = newRestaurantBudget;
-        let restaurantProfit =  this.restaurantBudget - this.baseRestaurantBudget - collectedTax
+        let restaurantProfit =  parseFloat((this.restaurantBudget - this.baseRestaurantBudget - collectedTax).toFixed(2))
         this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock);
         let individualCustomerResult = customer + ", " + customerObject.loadCustomerBudget() + ", " + dish + ", " + dishObject.loadDishPrice();
         this.tableOrderResult.push(individualCustomerResult);
