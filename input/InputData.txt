@@ -1,1 +1,1 @@
-Order, Potatoes, 10, Chicken, 5
+Buy, Julie Mirage, Fries

@@ -7,6 +7,7 @@ const resulted = async () => {
 
   const warehousData = await getData.getDataFromFile("./data/Warehouse.txt");
   const commandList = await getData.getDataFromFile("./data/command.json");
+
   const profitAndTaxList = await getData.getDataFromFile("./data/profitAndTaxFile.json");
 
   const inputData = await getData.getDataFromInputFile(
