@@ -11,9 +11,3 @@ module.exports = class IngridientsPricesParse {
         return parsIngredientsPrices
     }
 }
-
-
-// const getWarehousData = new WarehousData(resultHandleDatas);
-
-
-// module.exports = WarehousData;

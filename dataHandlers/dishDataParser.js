@@ -13,13 +13,4 @@ module.exports = class DishDataParse {
         return parsedData
     }
 
-    parsedIngredientsPrices (){
-        let parsedIngredientsPrices = {};
-      for (let element in this.data) {
-        parsedIngredientsPrices[this.data[element].ingredients] =
-        parseInt(this.data[element].price);
-      }
-      
-      return parsedIngredientsPrices
-    }
 }

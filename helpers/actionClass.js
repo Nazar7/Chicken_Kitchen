@@ -3,6 +3,7 @@ const Customer = require("../dataHandlers/customer.js");
 const Allergie = require("../dataHandlers/allergie.js");
 const WarehousCalculation = require("../dataHandlers/warehousCalculation.js");
 const DiscountCouter = require("../dataHandlers/discount ");
+const Tax = require("../dataHandlers/tax");
 
 
 module.exports = class Action {
@@ -21,19 +22,23 @@ module.exports = class Action {
     this.ParsedCustomerData = ParsedCustomerData;
     this.profitandtaxobjact = PROFIT_TAX_LIST;
     this.restaurantBudget = restaurantBudget;
-    // console.log(this.restaurantBudget);
     this.warehouseStock = {...warehouseStock};
     this.baseWarehousStock = warehouseStock;
     this.amountOfTableOrder = 0;
-    this.tableOrderResult = [];
+    this.tableResult = [];
+    this.buyActionResult = [];
+    this.resultObjact = {};
     this.baseRestaurantBudget = restaurantBudget;
+    this.actualCustomerBudget = 0;
   }
 
   loadBuyAction(data) {
     let expectedData = data.action + ", " + data.arg + ", " + data.val;
     let collectedTax = 0
     for (let item = 0; item <= data.arg.length - 1; item++) {
+
       let dish = data.val[item];
+      let comand = data.action;
       let customer = data.arg[item];
       let customerName = data.arg[item].split(" ")[0];
       let dishObject = new Dish(
@@ -43,55 +48,64 @@ module.exports = class Action {
         this.parsedIngridientsPricesData
       );
       let customerObject = new Customer(this.ParsedCustomerData, customer);
+      let customerBudget = customerObject.loadCustomerBudget(this.actualCustomerBudget)
       let allergieObjact = new Allergie(dish, customer, dishObject.getBaseIngridientsOfDish(), customerObject.loadCustomerAllergieProduct());
       let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
       if (
-        customerObject.loadCustomerBudget() > dishObject.loadDishPrice() &&
+          customerBudget > dishObject.loadDishPrice() &&
         allergieObjact.checkerAllergie() === "seccess"
       ) {
         let discountExist = new DiscountCouter().discountCounter(customer, this.profitandtaxobjact["every third discount"])
         let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"]) / 100
         let dishPriceForCustomer = profitFromDish + dishObject.loadDishPrice()
-          if(!this.profitandtaxobjact["transaction tax"] && !this.profitandtaxobjact["every third discount"]){
-            let restaurantTransactionTax = 0.1
-            let restaurantDiscoumt = 0.1
-            // return restaurantTransactionTax = 0.1
-          }
-            let restaurantTransactionTax = parseFloat((dishPriceForCustomer * (this.profitandtaxobjact["transaction tax"] / 100)).toFixed(2));
-            collectedTax += restaurantTransactionTax;
-        let restaurantDiscoumt = parseFloat((dishPriceForCustomer * (this.profitandtaxobjact["every third discount"] / 100)).toFixed(2));
-        // return restaurantTransactionTax = restaurantProfit * (100 + this.profitandtaxobjact["transaction tax"]) / 100
-            if(discountExist) {
-              let individualCustomerOrderAmount = dishObject.loadDishPrice() - restaurantDiscoumt
+        let texsObjact = new Tax(this.profitandtaxobjact["every third discount"], this.profitandtaxobjact["transaction tax"], dishPriceForCustomer)
+        if(discountExist) {
+              let individualCustomerOrderAmount = dishObject.loadDishPrice() - texsObjact.getTaxAndDiscountObjact().restaurantDiscoumt
             }
               let individualCustomerOrderAmount = dishObject.loadDishPrice()
         this.amountOfTableOrder += dishObject.loadDishPrice();
-        let newRestaurantBudget = this.restaurantBudget + dishPriceForCustomer - restaurantTransactionTax;
+        let newRestaurantBudget = (this.restaurantBudget + dishPriceForCustomer) - texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
         this.restaurantBudget = newRestaurantBudget;
         let restaurantProfit =  parseFloat((this.restaurantBudget - this.baseRestaurantBudget - collectedTax).toFixed(2))
         this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock);
-        let individualCustomerResult = customer + ", " + customerObject.loadCustomerBudget() + ", " + dish + ", " + dishObject.loadDishPrice();
-        this.tableOrderResult.push(individualCustomerResult);
+        collectedTax += texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
+        let individualCustomerResult = customer + ", " + customerBudget + ", " + dish + ", " + dishObject.loadDishPrice();
+        this.tableResult.push(individualCustomerResult);
+        // return this.resultObjact
       }
       else if (allergieObjact.checkerAllergie() !== "seccess") {
-        let result = expectedData + " -> " + customerName + ", " + customerObject.loadCustomerBudget() + dish + ", " + dishObject.loadDishPrice() + " -> can’t buy, cannot afford it.";
-        return { resultOfOrder: result };
-      } else if (customerObject.loadCustomerBudget() < dishObject.loadDishPrice()) {
-        let result = expectedData + " -> " + customerName + ", " + customerObject.loadCustomerBudget() + dish + ", XXX -> can’t buy, allergic to " +
-          customerObject.loadCustomerAllergieProduct();
-        return { resultOfOrder: result };
+        let result = expectedData + " -> " + customerName + ", " + customerBudget +
+            dish + ", XXX -> can’t buy, allergic to " +
+            customerObject.loadCustomerAllergieProduct();
+        this.resultObjact = { resultOfOrder: result }
+        // return this.buyActionResult.push(this.resultObjact);
+        return this.resultObjact
+      }
+      else if (customerBudget < dishObject.loadDishPrice()) {
+        let result = expectedData + " -> " + customerName + ", " + customerBudget + dish + ", " +
+            dishObject.loadDishPrice() + " -> can’t buy, cannot afford it.";
+        this.resultObjact = { resultOfOrder: result }
+        return this.buyActionResult.push(this.resultObjact);
       }
       if (item === data.arg.length - 1) {
-        let result = expectedData + " -> " + "seccess; " + "money amount: " + this.amountOfTableOrder;
-        let resObg = customer + ", " + customerObject.loadCustomerBudget() + ", " + dishObject.loadDishPrice();
-        return {
-          resultOfOrder: result,
-          command: this.tableOrderResult,
-          Warehouse: this.warehouseStock,
+        let resObg = customer + ", " + customerBudget + ", " + dish + ', ' + dishObject.loadDishPrice();
+        let resultSinglCustomer = expectedData + " -> " + customerName + ', ' +
+            customerBudget+ ', ' +  dish + ', ' +
+            dishObject.loadDishPrice() + ' -> ' + 'success'
+        this.actualCustomerBudget = customerBudget - dishObject.loadDishPrice();
+        this.resultObjact = {
+          resultOfOrder: resultSinglCustomer,
+          command: comand,
+          Warehouse: {...this.warehouseStock},
           Budget: this.restaurantBudget,
         };
+        this.buyActionResult.push(this.resultObjact)
+        return this.resultObjact
       }
     }
+
+    this.actualCustomerBudget = 0;
+    return this.resultObjact
   }
 
   loadOrderAction(data) {

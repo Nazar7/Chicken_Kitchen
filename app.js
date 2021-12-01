@@ -4,22 +4,10 @@ const resultHandleDatas = require('./dataHandlers/handleIAllDatasFromFiles.js');
 
 const InputDataParse = require('./dataHandlers/inputDataParser.js')
 const WarehouseDataParse = require('./dataHandlers/warehousDataParser.js')
-const WarehousCalculation = require('./dataHandlers/warehousCalculation.js')
 const IngridientsPricesDataParse = require('./dataHandlers/ingridientsPricesParser.js')
 const DishDataParse = require('./dataHandlers/dishDataParser.js')
 const CustomerDataParse = require('./dataHandlers/customersDataParser.js')
-const Dish = require('./dataHandlers/dish.js')
-const Customer = require('./dataHandlers/customer.js')
-const Allergie = require('./dataHandlers/allergie.js')
-const ActionBuy = require('./helpers/actionClass.js')
-
-
-
-const getData  = require("./services/getDataFromFile")
-const getDataFromCsv  = require("./services/getDataFromCsvFile")
 const Action  = require("./helpers/actionClass")
-const getOrderActions  = require("./helpers/actionClass")
-
 
 const res =  async () => {
     const datasFromFiles = await resultHandleDatas()
@@ -61,16 +49,14 @@ const res =  async () => {
         switch (dataList[i].action) {
             case 'Buy' :
             case 'Table':
-                let tableResult = ACTIONS.loadBuyAction(dataList[i])
-                console.log(tableResult)
-                actionResultsObjact.push(tableResult)
+                let buyResult = ACTIONS.loadBuyAction(dataList[i])
+
+                actionResultsObjact.push(buyResult)
+                // actionResultsObjact.push(tableResult)
                 break;
             case 'Order' :
                 let resultData = ACTIONS.loadOrderAction(dataList[i])
-                // console.log(orderResult)
                 actionResultsObjact.push(resultData)
-
-                // console.log(actionResultsObjact)
                 break;
             case 'Budget' :
                 let budgetResult = ACTIONS.loadBudgetAction(dataList[i])
@@ -83,10 +69,9 @@ const res =  async () => {
                 break;
         }
     }
-
-
+console.log(actionResultsObjact)
 //   resultData.push("Restaurant budget: " + newRestaurantBudget);
-        fs.writeFile("./output/OutputData.txt", resultData.join("\n"), (err) => {
+        fs.writeFile("./output/OutputData.txt", JSON.stringify(actionResultsObjact), (err) => {
             if (err) console.log(err);
         });
         fs.writeFile("./output/Audit.txt", resultAuditList.join("\n"), (err) => {

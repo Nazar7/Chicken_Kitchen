@@ -18,12 +18,20 @@ module.exports = class Customer{
        
       }
 
-      loadCustomerBudget(){
+      loadCustomerBudget(actualCustomerBudget){
           let customerBudget = ""
-          if (this.customer in this.budgetsList && this.budgetsList[this.customer] !== ''){
-            customerBudget = parseInt(this.budgetsList[this.customer])
-            return customerBudget
-       } else
+
+          if(actualCustomerBudget === 0){
+              if (this.customer in this.budgetsList && this.budgetsList[this.customer] !== ''){
+                  customerBudget = parseInt(this.budgetsList[this.customer])
+                  return customerBudget
+              }
+          }
+          else{
+
+              return actualCustomerBudget
+          }
+
        return console.log(this.customer + " doesnt have money at all")
      
       }
