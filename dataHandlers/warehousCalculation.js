@@ -7,6 +7,8 @@ module.exports = class WarehouseCalculation{
       }
 
       warehousStockDecrease(warehouse) {
+          this.order
+          this.getBaseIngridientsOfDish
         if(this.order in warehouse){
             // console.log(this.warehouse)
             warehouse[this.order] = warehouse[this.order]-1
@@ -17,10 +19,10 @@ module.exports = class WarehouseCalculation{
                 // console.log(this.orderIngridients[i] in this.warehouse)
                 if(this.getBaseIngridientsOfDish[i] in warehouse){
                     warehouse[this.getBaseIngridientsOfDish[i]] = warehouse[this.getBaseIngridientsOfDish[i]]-1
-                 return  warehouse
                 }
             }
         }
+          return  warehouse
     }
 
     warehousStockIncrise(){

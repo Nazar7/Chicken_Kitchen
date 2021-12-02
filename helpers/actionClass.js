@@ -33,6 +33,7 @@ module.exports = class Action {
   }
 
   loadBuyAction(data) {
+    let individualCustomerResult
     let expectedData = data.action + ", " + data.arg + ", " + data.val;
     let collectedTax = 0
     let tableAmountOrder = 0;
@@ -57,22 +58,26 @@ module.exports = class Action {
         allergieObjact.checkerAllergie() === "seccess"
       ) {
         let discountExist = new DiscountCouter().discountCounter(customer, this.profitandtaxobjact["every third discount"])
-        let profitFromDish = dishObject.loadDishPrice()
-        let dishPriceForCustomer = profitFromDish
+        let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"] / 100)
+        let dishPriceForCustomer = profitFromDish + dishObject.loadDishPrice();
         let texsObjact = new Tax(this.profitandtaxobjact["every third discount"], this.profitandtaxobjact["transaction tax"], dishPriceForCustomer)
         if(discountExist) {
               let individualCustomerOrderAmount = dishObject.loadDishPrice() - texsObjact.getTaxAndDiscountObjact().restaurantDiscoumt
             }
               let individualCustomerOrderAmount = dishObject.loadDishPrice()
         this.amountOfTableOrder += dishObject.loadDishPrice() + profitFromDish;
+
         let newRestaurantBudget = (this.restaurantBudget + dishPriceForCustomer) - texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
         this.restaurantBudget = newRestaurantBudget;
         let restaurantProfit =  parseFloat((this.restaurantBudget - this.baseRestaurantBudget - collectedTax).toFixed(2))
         // this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock);
         collectedTax += texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
-        let individualCustomerResult = customer + ", " + customerBudget + ", " + dish + ", " + Math.ceil(dishPriceForCustomer);
-        tableAmountOrder += dishObject.loadDishPrice() + texsObjact
-        this.tableResult.push(individualCustomerResult);
+        if(data.arg.length > 1) {
+          individualCustomerResult = customer + ", " + customerBudget + ", " + dish + ", " + Math.ceil(dishPriceForCustomer)
+          tableAmountOrder += Math.ceil(dishPriceForCustomer)
+          this.tableResult.push(individualCustomerResult)
+        }
+
         // return this.resultObjact
       }
       else if (allergieObjact.checkerAllergie() !== "seccess") {
@@ -89,16 +94,17 @@ module.exports = class Action {
         this.resultObjact = { resultOfOrder: result }
         return this.buyActionResult.push(this.resultObjact);
       }
+      let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
+      this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock);
       if (item === data.arg.length - 1) {
-        let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
-        this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock);
+
         let resTableOrder = expectedData + " -> success; money amount: " + tableAmountOrder;
         let resultSinglCustomer = expectedData + " -> " + customerName + ', ' +
             customerBudget+ ', ' +  dish + ', ' + (comand === 'Table') ? resTableOrder :
             dishObject.loadDishPrice() + ' -> ' + 'success'
         // this.actualCustomerBudget = customerBudget - dishObject.loadDishPrice();
         this.resultObjact = {
-          resultOfTable: this.tableResult,
+          resultOfTable: (data.arg.length > 1) ? this.tableResult : '',
           resultOfOrder: (!resTableOrder) ? resTableOrder : resultSinglCustomer,
           command: comand,
           Warehouse: {...this.warehouseStock},
@@ -108,7 +114,7 @@ module.exports = class Action {
         return this.resultObjact
       }
     }
-
+    this.tableResult = []
     this.actualCustomerBudget = 0;
     return this.resultObjact
   }
