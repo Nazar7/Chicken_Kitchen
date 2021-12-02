@@ -24,15 +24,15 @@ module.exports = class Dish {
       }
 
       loadDishPrice () {
+          this.dish;
         let totalOrderPrice = null;
-          for (let i = 0;  i < this.getBaseIngridientsOfDish().length; i++){
+          for (let i = 0;  i <= this.getBaseIngridientsOfDish().length; i++){
             for (const [key, value] of Object.entries(this.parsedIngridientsPricesData)) {
                 if(key === this.getBaseIngridientsOfDish()[i]){
                   totalOrderPrice += parseInt(value)
                 }
             }
           }
-  
           return totalOrderPrice;
       }
 
