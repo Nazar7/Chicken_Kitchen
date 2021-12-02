@@ -1,0 +1,5 @@
+{
+  "total_maximum": 500,
+  "max_ingredient_type": 10,
+  "max_dish_type": 3
+}

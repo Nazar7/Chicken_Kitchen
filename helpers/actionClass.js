@@ -14,7 +14,8 @@ module.exports = class Action {
     ParsedCustomerData,
     PROFIT_TAX_LIST,
     restaurantBudget,
-    warehouseStock
+    warehouseStock,
+    WAREHOUSE_CONFIG
   ) {
     this.baseIngridients = BASE_INGREDIENTS_LIST;
     this.parsedIngridientsPricesData = ParsedIngridientsPricesData;
@@ -30,6 +31,8 @@ module.exports = class Action {
     this.resultObjact = {};
     this.baseRestaurantBudget = restaurantBudget;
     this.actualCustomerBudget = 0;
+    //Enzelt
+    this.warehouseConfig = WAREHOUSE_CONFIG;
   }
 
   loadBuyAction(data) {
@@ -108,12 +111,96 @@ module.exports = class Action {
     return this.resultObjact
   }
 
+  //Enzelt
+  isBaseIngredient(ingredient) {
+    if (this.baseIngridients[0].ingredients.split(',').includes(ingredient)) {
+      return true;
+    } else {
+      return false
+    }
+  }
+
+  getTotalWarehouseQuantity() {
+    let quantity = 0;
+    Object.values(this.warehouseStock).map((item) => {
+      quantity += parseInt(item);
+    });
+    return quantity;
+  }
+
+  //Enzelt 6.7.4
+  checkWarehouseConfig(ingredientName, ingridientQuantity) {
+    let wastedData = {
+      wasted: 0,
+      canOrder: 0,
+      message: '',
+    };
+    let wantToAdd = ingridientQuantity;
+
+    const maxAllowedIngredients =  this.warehouseConfig.max_ingredient_type;
+    const maxAllowedDishes = this.warehouseConfig.max_dish_type;
+
+    let canOrder = 0;
+    let wasted = 0;
+
+    let currentQuantity = this.warehouseStock[ingredientName];
+
+    const totalWarehouseQuantity = this.getTotalWarehouseQuantity();
+
+    // Перевіряю чи базовий інгредієнт чи ні,
+    // відповідно до цього визначаю скліьки можна замовити(згідно до конфігів)
+    if (this.isBaseIngredient(ingredientName)) {
+      canOrder = maxAllowedIngredients - currentQuantity;
+    } else {
+      canOrder = maxAllowedDishes - currentQuantity;
+    }
+
+    // перевіряю чи те, що можемо додати більше нуля,  але також перевіряємо
+    // чи часом ми не хочемо замовити більше ніж можемо, якщо так, то шукаємо
+    if (canOrder > 0 && canOrder < wantToAdd) {
+      wasted = wantToAdd - canOrder;
+      wastedData.message += 'Limit of ingredient/dish reached partially' + "\r\n";
+    }
+
+    if (canOrder < 0) {
+      canOrder = 0;
+      wastedData.wasted = wantToAdd;
+      wastedData.canOrder = canOrder;
+      wastedData.message += 'Total limit of ingredient/dish reached' + "\r\n";
+      return wastedData;
+    }
+
+    if (totalWarehouseQuantity + canOrder > this.warehouseConfig.total_maximum) {
+      //458 + 5 - 500 = 3
+      let difference = totalWarehouseQuantity + canOrder - this.warehouseConfig.total_maximum;
+      if ((totalWarehouseQuantity + canOrder - this.warehouseConfig.total_maximum) > 0) {
+        wasted = canOrder - difference;
+        canOrder = difference;
+      }
+      wastedData.wasted = wasted;
+      wastedData.canOrder = canOrder;
+      wastedData.message += 'Total limit reached' + "\r\n";
+    }
+
+    wastedData.wasted = wasted;
+    wastedData.canOrder = canOrder;
+    return wastedData;
+  }
+
+
   loadOrderAction(data) {
     let ordersList = [data.action, data.arg, data.val];
-    let expectedData = data.action + ", " + data.arg + ", " + data.val;
-    for (let item = 1; item <= ordersList.length-1; item++) {
+
+    let wastedData = {};
+    for (let item = 1; item <= ordersList.length-2; item++) {
       let ingridientName = ordersList[item][0];
-      let ingridientQuantity = ordersList[item][1];
+      let ingridientQuantity = ordersList[item + 1][0];
+
+      //Enzelt 6.7.4
+      wastedData = this.checkWarehouseConfig(ingridientName, ingridientQuantity);
+      ingridientQuantity = wastedData.canOrder;
+      //******
+
         if ( this.restaurantBudget > 0) {
           let ingridientPrice = this.parsedIngridientsPricesData.parsedIngridientsPrices()[ingridientName]
           let costOfOrderedIngredient = ingridientQuantity * ingridientPrice;
@@ -134,11 +221,15 @@ module.exports = class Action {
         } 
 
     }
-    let result = expectedData + " -> " + "seccess";
+    let expectedData = data.action + ", " + data.arg + ", " + data.val;
+    let result = expectedData + " -> "
+        + " Problems: " + wastedData.message
+        + " Result: " +  data.action + ", " + data.arg + ", " + wastedData.canOrder;
     return {
       command: result,
       Warehouse: {...this.warehouseStock},
       Budget: this.restaurantBudget,
+      wastedData: wastedData,
     };
   }
 
