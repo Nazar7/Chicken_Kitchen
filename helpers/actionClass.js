@@ -15,7 +15,8 @@ module.exports = class Action {
     PROFIT_TAX_LIST,
     restaurantBudget,
     warehouseStock,
-    WAREHOUSE_CONFIG
+    WAREHOUSE_CONFIG,
+    ALLERGIES_WAREHOUSE_CONFIG
   ) {
     this.baseIngridients = BASE_INGREDIENTS_LIST;
     this.parsedIngridientsPricesData = ParsedIngridientsPricesData;
@@ -33,6 +34,8 @@ module.exports = class Action {
     this.actualCustomerBudget = 0;
     //Enzelt
     this.warehouseConfig = WAREHOUSE_CONFIG;
+    this.allergiesWarehouseConfig = ALLERGIES_WAREHOUSE_CONFIG;
+    //*******
   }
 
   loadBuyAction(data) {
@@ -58,7 +61,12 @@ module.exports = class Action {
       // let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
       if (
           customerBudget > dishObject.loadDishPrice() &&
-        allergieObjact.checkerAllergie() === "seccess"
+        allergieObjact.checkerAllergie(
+            dishObject,
+            this.warehouseStock,
+            new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish()),
+            this.restaurantBudget,
+            this.allergiesWarehouseConfig) === "seccess"
       ) {
         let discountExist = new DiscountCouter().discountCounter(customer, this.profitandtaxobjact["every third discount"])
         let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"] / 100)
@@ -83,10 +91,17 @@ module.exports = class Action {
 
         // return this.resultObjact
       }
-      else if (allergieObjact.checkerAllergie() !== "seccess") {
+      else if (allergieObjact.checkerAllergie(
+          dishObject,
+          this.warehouseStock,
+          new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish()),
+          this.restaurantBudget,
+          this.allergiesWarehouseConfig
+      ) !== "seccess") {
         let result = expectedData + " -> " + customerName + ", " + customerBudget + ', ' +
             dish + ", XXX -> can’t buy, allergic to " +
             customerObject.loadCustomerAllergieProduct();
+
         this.resultObjact = { resultOfOrder: result }
         // return this.buyActionResult.push(this.resultObjact);
         return this.resultObjact
