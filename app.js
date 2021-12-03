@@ -55,7 +55,7 @@ const res =  async () => {
             case 'Buy' :
             case 'Table':
                 let buyResult = ACTIONS.loadBuyAction(dataList[i])
-
+console.log(buyResult)
                 actionResultsObjact.push(buyResult)
                 // actionResultsObjact.push(tableResult)
                 break;

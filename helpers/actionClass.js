@@ -36,8 +36,10 @@ module.exports = class Action {
   }
 
   loadBuyAction(data) {
+    let individualCustomerResult
     let expectedData = data.action + ", " + data.arg + ", " + data.val;
     let collectedTax = 0
+    let tableAmountOrder = 0;
     for (let item = 0; item <= data.arg.length - 1; item++) {
 
       let dish = data.val[item];
@@ -53,31 +55,36 @@ module.exports = class Action {
       let customerObject = new Customer(this.ParsedCustomerData, customer);
       let customerBudget = customerObject.loadCustomerBudget(this.actualCustomerBudget)
       let allergieObjact = new Allergie(dish, customer, dishObject.getBaseIngridientsOfDish(), customerObject.loadCustomerAllergieProduct());
-      let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
+      // let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
       if (
           customerBudget > dishObject.loadDishPrice() &&
         allergieObjact.checkerAllergie() === "seccess"
       ) {
         let discountExist = new DiscountCouter().discountCounter(customer, this.profitandtaxobjact["every third discount"])
-        let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"]) / 100
-        let dishPriceForCustomer = profitFromDish + dishObject.loadDishPrice()
+        let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"] / 100)
+        let dishPriceForCustomer = profitFromDish + dishObject.loadDishPrice();
         let texsObjact = new Tax(this.profitandtaxobjact["every third discount"], this.profitandtaxobjact["transaction tax"], dishPriceForCustomer)
         if(discountExist) {
               let individualCustomerOrderAmount = dishObject.loadDishPrice() - texsObjact.getTaxAndDiscountObjact().restaurantDiscoumt
             }
               let individualCustomerOrderAmount = dishObject.loadDishPrice()
-        this.amountOfTableOrder += dishObject.loadDishPrice();
+        this.amountOfTableOrder += dishObject.loadDishPrice() + profitFromDish;
+
         let newRestaurantBudget = (this.restaurantBudget + dishPriceForCustomer) - texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
         this.restaurantBudget = newRestaurantBudget;
         let restaurantProfit =  parseFloat((this.restaurantBudget - this.baseRestaurantBudget - collectedTax).toFixed(2))
-        this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock);
+        // this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock);
         collectedTax += texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
-        let individualCustomerResult = customer + ", " + customerBudget + ", " + dish + ", " + dishObject.loadDishPrice();
-        this.tableResult.push(individualCustomerResult);
+        if(data.arg.length > 1) {
+          individualCustomerResult = customer + ", " + customerBudget + ", " + dish + ", " + Math.ceil(dishPriceForCustomer)
+          tableAmountOrder += Math.ceil(dishPriceForCustomer)
+          this.tableResult.push(individualCustomerResult)
+        }
+
         // return this.resultObjact
       }
       else if (allergieObjact.checkerAllergie() !== "seccess") {
-        let result = expectedData + " -> " + customerName + ", " + customerBudget +
+        let result = expectedData + " -> " + customerName + ", " + customerBudget + ', ' +
             dish + ", XXX -> can’t buy, allergic to " +
             customerObject.loadCustomerAllergieProduct();
         this.resultObjact = { resultOfOrder: result }
@@ -90,14 +97,18 @@ module.exports = class Action {
         this.resultObjact = { resultOfOrder: result }
         return this.buyActionResult.push(this.resultObjact);
       }
+      let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
+      this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock);
       if (item === data.arg.length - 1) {
-        let resObg = customer + ", " + customerBudget + ", " + dish + ', ' + dishObject.loadDishPrice();
+
+        let resTableOrder = expectedData + " -> success; money amount: " + tableAmountOrder;
         let resultSinglCustomer = expectedData + " -> " + customerName + ', ' +
-            customerBudget+ ', ' +  dish + ', ' +
+            customerBudget+ ', ' +  dish + ', ' + (comand === 'Table') ? resTableOrder :
             dishObject.loadDishPrice() + ' -> ' + 'success'
-        this.actualCustomerBudget = customerBudget - dishObject.loadDishPrice();
+        // this.actualCustomerBudget = customerBudget - dishObject.loadDishPrice();
         this.resultObjact = {
-          resultOfOrder: resultSinglCustomer,
+          resultOfTable: (data.arg.length > 1) ? this.tableResult : '',
+          resultOfOrder: (!resTableOrder) ? resTableOrder : resultSinglCustomer,
           command: comand,
           Warehouse: {...this.warehouseStock},
           Budget: this.restaurantBudget,
@@ -106,7 +117,7 @@ module.exports = class Action {
         return this.resultObjact
       }
     }
-
+    this.tableResult = []
     this.actualCustomerBudget = 0;
     return this.resultObjact
   }

@@ -1,1 +1,1 @@
-Princess Chicken, 1, Tuna, 5, Chocolate, 5, Youth Sauce, 3, Potatoes, 10
+Princess Chicken, 1, Chicken, 5, Tuna, 5, Potatoes, 5, Asparagus, 5, Milk, 5, Honey, 5, Paprika, 5, Garlic, 5, Water, 5, Lemon, 5, Tomatoes, 5, Pickles, 5, Feta, 5, Vinegar, 5, Rice, 5, Chocolate, 5
