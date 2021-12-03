@@ -21,7 +21,7 @@ module.exports = class Dish {
             } else {
               this.#_getBaseIngridientsOfDish(item, arr);
             }
-          }).join(',')
+          })
 
       }
 
