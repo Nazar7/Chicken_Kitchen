@@ -14,7 +14,9 @@ const res =  async () => {
 
     const BASE_INGREDIENTS_LIST = datasFromFiles.baseIngredients
     const PROFIT_TAX_LIST = JSON.parse(datasFromFiles.profitAndTaxList)
-
+    //Enzelt
+    const WAREHOUSE_CONFIG = JSON.parse(datasFromFiles.warehouseConfig)
+    //******
 
     let restaurantBudget = 500;
     var resultData = [];
@@ -40,7 +42,10 @@ const res =  async () => {
         ParsedCustomerData,
         PROFIT_TAX_LIST,
         restaurantBudget,
-        warehouseStock
+        warehouseStock,
+        //Enzelt
+        WAREHOUSE_CONFIG
+        //******
     )
     let actionResultsObjact = []
     let resultAuditList = []

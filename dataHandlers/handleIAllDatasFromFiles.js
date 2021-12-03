@@ -5,10 +5,14 @@ const getCustomersDatas = require("../dataHandlers/handleCustomersDataClass")
 
 const resulted = async () => {
 
+  //Enzelt
+  const warehouseConfig = await getData.getDataFromFile("./data/warehouse.json");
+  //********
   const warehousData = await getData.getDataFromFile("./data/Warehouse.txt");
   const commandList = await getData.getDataFromFile("./data/command.json");
 
   const profitAndTaxList = await getData.getDataFromFile("./data/profitAndTaxFile.json");
+
 
   const inputData = await getData.getDataFromInputFile(
     "./input/inputData.txt"
@@ -34,7 +38,7 @@ const resulted = async () => {
     "/BaseIngridientsPrice.csv"
   );
 
-  const customersBudgets = await getDataFromCsv.getDataFromFile(
+  const customersBudgets =   await getDataFromCsv.getDataFromFile(
     "/RegularCustomerBudget.csv"
   );
 
@@ -57,7 +61,10 @@ const resulted = async () => {
     customersBudgets,
     parsedWarehouseStock,
     parsedCustomersAllergiesProducts,
-    profitAndTaxList
+    profitAndTaxList,
+    //Enzelt
+    warehouseConfig
+    //*****
   });
 };
 
