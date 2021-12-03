@@ -1,7 +1,15 @@
 {
+  "scripts": {
+    "test": "jest"
+  },
   "dependencies": {
     "csv-parser": "^3.0.0",
+    "csv-string": "^4.0.1",
     "csvtojson": "^2.0.10",
     "json2csv": "^5.0.6"
+  },
+  "devDependencies": {
+    "jest": "^27.3.1",
+    "prettier": "2.5.0"
   }
 }
