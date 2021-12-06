@@ -188,7 +188,7 @@ module.exports = class Action {
       wastedData.message += 'Limit of ingredient/dish reached partially' + "\r\n";
     }
 
-    if (canOrder < 0) {
+    if (canOrder <= 0) {
       canOrder = 0;
       wastedData.wasted = wantToAdd;
       wastedData.canOrder = canOrder;

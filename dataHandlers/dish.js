@@ -6,8 +6,21 @@ module.exports = class Dish {
         this.parsedIngridientsPricesData = getParsedIngridientsPricesData.parsedIngridientsPrices();
       }
 
+    //Enzelt
+    isBaseIngredient(ingredient) {
+        if (this.baseIngredients[0].ingredients.split(',').includes(ingredient)) {
+            return true;
+        } else {
+            return false
+        }
+    }
+
       getBaseIngridientsOfDish () {
-        let arr = []
+        let arr = [];
+        if (this.isBaseIngredient(this.dish)) {
+            arr.push(this.dish)
+            return arr;
+        }
         this.#_getBaseIngridientsOfDish(this.dish, arr);
         return arr;
       }
