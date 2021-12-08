@@ -7,6 +7,7 @@ const resulted = async () => {
 
   //Enzelt
   const warehouseConfig = await getData.getDataFromFile("./data/warehouse.json");
+  const allergiesWarehouseConfig = await getData.getDataFromFile("./data/allergiesWarehouse.json");
   //********
   const warehousData = await getData.getDataFromFile("./data/Warehouse.txt");
   const commandList = await getData.getDataFromFile("./data/command.json");
@@ -63,7 +64,8 @@ const resulted = async () => {
     parsedCustomersAllergiesProducts,
     profitAndTaxList,
     //Enzelt
-    warehouseConfig
+    warehouseConfig,
+    allergiesWarehouseConfig
     //*****
   });
 };
