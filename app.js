@@ -19,7 +19,7 @@ const res =  async () => {
     const ALLERGIES_WAREHOUSE_CONFIG = JSON.parse(datasFromFiles.allergiesWarehouseConfig);
     //******
 
-    let restaurantBudget = 500;
+    let restaurantBudget = -5;
     var resultData = [];
     resultData.push("Restaurant budget: " + restaurantBudget);
     let newRestaurantBudget = restaurantBudget;
@@ -53,6 +53,18 @@ const res =  async () => {
     let resultAuditList = []
 
     for (let i = 0; i <= dataList.length - 1; i++) {
+
+        //ENZELT 6.7.6
+
+        if (restaurantBudget < 0 && dataList[i].action !== 'Budget') {
+            let message = "RESTAURANT BANKRUPT";
+            const res = { message, restaurantBudget: restaurantBudget, warehousStock: warehouseStock};
+            actionResultsObjact.push(res)
+            continue;
+        }
+        let skipReduceBudget = true;
+
+
         switch (dataList[i].action) {
             case 'Buy' :
             case 'Table':
@@ -66,7 +78,8 @@ console.log(buyResult)
                 actionResultsObjact.push(resultData)
                 break;
             case 'Budget' :
-                let budgetResult = ACTIONS.loadBudgetAction(dataList[i])
+                let budgetResult = ACTIONS.loadBudgetAction(dataList[i], skipReduceBudget)
+                restaurantBudget = budgetResult.restaurantBudget;
                 actionResultsObjact.push(budgetResult)
                 break;
             case 'Audit' :

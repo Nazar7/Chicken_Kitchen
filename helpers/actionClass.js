@@ -226,25 +226,19 @@ module.exports = class Action {
       wastedData = this.checkWarehouseConfig(ingridientName, ingridientQuantity);
       ingridientQuantity = wastedData.canOrder;
       //******
-
-        if ( this.restaurantBudget > 0) {
-          let ingridientPrice = this.parsedIngridientsPricesData.parsedIngridientsPrices()[ingridientName]
-          let costOfOrderedIngredient = ingridientQuantity * ingridientPrice;
-          if(!this.profitandtaxobjact["transaction tax"]){
-            let restaurantTransactionTax
-            return restaurantTransactionTax = costOfOrderedIngredient * (100 + 10) / 100
-          }
-          let restaurantTransactionTax  = costOfOrderedIngredient * (this.profitandtaxobjact["transaction tax"] / 100)
-          this.restaurantBudget = this.restaurantBudget - (costOfOrderedIngredient + restaurantTransactionTax)
-          if(this.warehouseStock[ingridientName] === undefined){
-            this.warehouseStock[ingridientName] = ingridientQuantity
-          } else {
-            this.warehouseStock[ingridientName] = +this.warehouseStock[ingridientName] + +ingridientQuantity;
-          }
-        }  else {
-          let message = "RESTAURANT BANKRUPT";
-          return { message, restaurantBudget: this.restaurantBudget, warehousStock: this.warehouseStock};
-        } 
+      let ingridientPrice = this.parsedIngridientsPricesData.parsedIngridientsPrices()[ingridientName]
+      let costOfOrderedIngredient = ingridientQuantity * ingridientPrice;
+      if(!this.profitandtaxobjact["transaction tax"]){
+        let restaurantTransactionTax
+        return restaurantTransactionTax = costOfOrderedIngredient * (100 + 10) / 100
+      }
+      let restaurantTransactionTax  = costOfOrderedIngredient * (this.profitandtaxobjact["transaction tax"] / 100)
+      this.restaurantBudget = this.restaurantBudget - (costOfOrderedIngredient + restaurantTransactionTax)
+      if(this.warehouseStock[ingridientName] === undefined){
+        this.warehouseStock[ingridientName] = ingridientQuantity
+      } else {
+        this.warehouseStock[ingridientName] = +this.warehouseStock[ingridientName] + +ingridientQuantity;
+      }
 
     }
     let expectedData = data.action + ", " + data.arg + ", " + data.val;
@@ -260,14 +254,14 @@ module.exports = class Action {
   }
 
 
-  loadBudgetAction(data) {
+  loadBudgetAction(data, skipReduce = false) {
     let ordersList = [data.action, data.arg, data.val];
-      if (data.arg === "=") {
-        this.restaurantBudget = data.val;
-      } else if (data.arg === "+") {
-        this.restaurantBudget += data.val;
-      } else if (data.arg === "-") {
-        this.restaurantBudget -= data.val;
+      if (data.arg[0] === "=") {
+        this.restaurantBudget = data.val[0];
+      } else if (data.arg[0] === "+") {
+        this.restaurantBudget += data.val[0];
+      } else if (data.arg[0] === "-") {
+        if (!skipReduce) this.restaurantBudget -= data.val[0];
       }
       return { restaurantBudget: this.restaurantBudget };
   }
