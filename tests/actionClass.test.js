@@ -26,9 +26,12 @@ test("Check checkWarehouseConfig " +
 	const BASE_INGREDIENTS_LIST = datasFromFiles.baseIngredients
 	const PROFIT_TAX_LIST = JSON.parse(datasFromFiles.profitAndTaxList)
 //Enzelt
-	const WAREHOUSE_CONFIG = JSON.parse(datasFromFiles.warehouseConfig)
-	const ALLERGIES_WAREHOUSE_CONFIG = JSON.parse(datasFromFiles.allergiesWarehouseConfig);
-//******
+	//can be configurated
+	let WAREHOUSE_CONFIG = JSON.parse(datasFromFiles.warehouseConfig);
+	let ALLERGIES_WAREHOUSE_CONFIG = JSON.parse(datasFromFiles.allergiesWarehouseConfig);
+	WAREHOUSE_CONFIG.total_maximum = 500;
+	ALLERGIES_WAREHOUSE_CONFIG.dishes_with_allergies = 'keep';
+	//******
 
 	let restaurantBudget = 500;
 	var resultData = [];
