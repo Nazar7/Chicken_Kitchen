@@ -17,9 +17,10 @@ const res =  async () => {
     //Enzelt
     const WAREHOUSE_CONFIG = JSON.parse(datasFromFiles.warehouseConfig)
     const ALLERGIES_WAREHOUSE_CONFIG = JSON.parse(datasFromFiles.allergiesWarehouseConfig);
+    const ORDER_CONFIG = JSON.parse(datasFromFiles.orderConfig);
     //******
 
-    let restaurantBudget = -5;
+    let restaurantBudget = 500;
     var resultData = [];
     resultData.push("Restaurant budget: " + restaurantBudget);
     let newRestaurantBudget = restaurantBudget;
@@ -46,7 +47,8 @@ const res =  async () => {
         warehouseStock,
         //Enzelt
         WAREHOUSE_CONFIG,
-        ALLERGIES_WAREHOUSE_CONFIG
+        ALLERGIES_WAREHOUSE_CONFIG,
+        ORDER_CONFIG
         //******
     )
     let actionResultsObjact = []

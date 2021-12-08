@@ -15,8 +15,11 @@ module.exports = class Action {
     PROFIT_TAX_LIST,
     restaurantBudget,
     warehouseStock,
+    //Enzelt
     WAREHOUSE_CONFIG,
-    ALLERGIES_WAREHOUSE_CONFIG
+    ALLERGIES_WAREHOUSE_CONFIG,
+    ORDER_CONFIG,
+    //*****
   ) {
     this.baseIngridients = BASE_INGREDIENTS_LIST;
     this.parsedIngridientsPricesData = ParsedIngridientsPricesData;
@@ -35,6 +38,7 @@ module.exports = class Action {
     //Enzelt
     this.warehouseConfig = WAREHOUSE_CONFIG;
     this.allergiesWarehouseConfig = ALLERGIES_WAREHOUSE_CONFIG;
+    this.orderConfig = ORDER_CONFIG;
     //*******
   }
 
@@ -213,15 +217,53 @@ module.exports = class Action {
     return wastedData;
   }
 
+  checkOrderConfig(ingredientName, ingridientQuantity) {
+
+    let orderConfig = this.orderConfig.order;
+    let orderConfigData = {
+      canOrder: ingridientQuantity,
+      message: ''
+    };
+    const isBase = this.isBaseIngredient(ingredientName);
+
+    if (orderConfig === 'all') {
+      orderConfigData.message = 'Can order all';
+      return orderConfigData;
+    }
+    if (orderConfig === 'no') {
+      orderConfigData.canOrder = 0;
+      orderConfigData.message = 'Can`t order all';
+      return orderConfigData;
+    }
+    if (isBase && orderConfig === 'ingredients') {
+      orderConfigData.message = 'Can order ingredient';
+      return orderConfigData;
+    } else if(!isBase && orderConfig === 'dish') {
+      orderConfigData.message = 'Can order dish';
+      return orderConfigData;
+    } else {
+      orderConfigData.message = 'Can`t order ingredient/dish';
+      return orderConfigData;
+    }
+
+    switch (this.orderConfig) {
+      case 'ingredients':
+    }
+    return orderConfigData;
+  }
 
   loadOrderAction(data) {
     let ordersList = [data.action, data.arg, data.val];
 
+    let orderConfigData = {};
     let wastedData = {};
     for (let item = 1; item <= ordersList.length-2; item++) {
       let ingridientName = ordersList[item][0];
       let ingridientQuantity = ordersList[item + 1][0];
 
+      //Enzelt 6.7.7 (check order config) //no, ingredients, dish, all
+      orderConfigData = this.checkOrderConfig(ingridientName, ingridientQuantity);
+      ingridientQuantity = orderConfigData.canOrder;
       //Enzelt 6.7.4
       wastedData = this.checkWarehouseConfig(ingridientName, ingridientQuantity);
       ingridientQuantity = wastedData.canOrder;
@@ -243,7 +285,7 @@ module.exports = class Action {
     }
     let expectedData = data.action + ", " + data.arg + ", " + data.val;
     let result = expectedData + " -> "
-        + " Problems: " + wastedData.message
+        + " Problems(wasted, order config): " + wastedData.message + "; " + orderConfigData.message
         + " Result: " +  data.action + ", " + data.arg + ", " + wastedData.canOrder;
     return {
       command: result,
