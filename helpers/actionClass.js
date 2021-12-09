@@ -18,8 +18,7 @@ module.exports = class Action {
     //Enzelt
     WAREHOUSE_CONFIG,
     ALLERGIES_WAREHOUSE_CONFIG,
-    ORDER_CONFIG,
-    SPOIL_CONFIG
+    ORDER_CONFIG
     //*****
   ) {
     this.baseIngridients = BASE_INGREDIENTS_LIST;
