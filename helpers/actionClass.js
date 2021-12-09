@@ -18,7 +18,7 @@ module.exports = class Action {
     //Enzelt
     WAREHOUSE_CONFIG,
     ALLERGIES_WAREHOUSE_CONFIG,
-    ORDER_CONFIG,
+    ORDER_CONFIG
     //*****
   ) {
     this.baseIngridients = BASE_INGREDIENTS_LIST;
@@ -257,9 +257,10 @@ module.exports = class Action {
 
     let orderConfigData = {};
     let wastedData = {};
-    for (let item = 1; item <= ordersList.length-2; item++) {
-      let ingridientName = ordersList[item][0];
-      let ingridientQuantity = ordersList[item + 1][0];
+    ordersList.shift();
+    ordersList.map((item) => {
+      let ingridientName = item[0];
+      let ingridientQuantity = item[1];
 
       //Enzelt 6.7.7 (check order config) //no, ingredients, dish, all
       orderConfigData = this.checkOrderConfig(ingridientName, ingridientQuantity);
@@ -282,7 +283,8 @@ module.exports = class Action {
         this.warehouseStock[ingridientName] = +this.warehouseStock[ingridientName] + +ingridientQuantity;
       }
 
-    }
+    });
+
     let expectedData = data.action + ", " + data.arg + ", " + data.val;
     let result = expectedData + " -> "
         + " Problems(wasted, order config): " + wastedData.message + "; " + orderConfigData.message
