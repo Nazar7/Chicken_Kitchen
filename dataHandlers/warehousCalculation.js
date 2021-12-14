@@ -3,14 +3,28 @@ module.exports = class WarehouseCalculation{
         this.order = order;
         // this.warehouse = warehouse;
         this.getBaseIngridientsOfDish = getBaseIngridientsOfDish;
-      
       }
 
-      warehousStockDecrease(warehouse) {
-          this.order
-          this.getBaseIngridientsOfDish
-        if(this.order in warehouse){
-            // console.log(this.warehouse)
+    //Sofia
+    checkAllIngredients = (order, componentsOfFood, warehouse, baseIngredients) => {
+        let ingredientsFromMenu = food[order];
+
+        for ( let i = 0; i < ingredientsFromMenu.length; i++ ) {
+            const checkExistsOfIng = baseIngredients.some(item => warehouse[ingredientsFromMenu[i]] > 0 || ingredientsFromMenu[i] === item);
+            if (checkExistsOfIng) {
+                componentsOfFood.push(ingredientsFromMenu[i]);
+            } else {
+                this.checkAllIngredients(ingredientsFromMenu[i], componentsOfFood, warehouse, baseIngredients)
+            }
+        }
+    }
+
+    warehousStockDecrease(warehouse, baseIngredients) {
+        // this.order
+        const componentsOfFood = [];
+          this.checkAllIngredients(this.order, componentsOfFood, warehouse, baseIngredients)
+        if(this.order in warehouse && warehouse[this.order] > 0){
+            // console.log(this.warehouse)s
             warehouse[this.order] = warehouse[this.order]-1
           return warehouse
         } else {

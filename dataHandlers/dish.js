@@ -15,6 +15,17 @@ module.exports = class Dish {
         }
     }
 
+    //Sofia
+
+    reduceFromWarehouses () {
+        // if (order on the warehouses) {
+        //  reduce order from warehouse
+        // } else if (components are on the warehouse ) {
+        //  reduce components
+        // }
+
+    }
+
       getBaseIngridientsOfDish () {
         let arr = [];
         if (this.isBaseIngredient(this.dish)) {
@@ -51,7 +62,5 @@ module.exports = class Dish {
           }
           return totalOrderPrice;
       }
-
-    
 
 }

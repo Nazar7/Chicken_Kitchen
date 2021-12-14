@@ -1,6 +1,4 @@
-const Customer = require("../dataHandlers/customer.js");
-
-module.exports = class Discount {
+class Discount {
     constructor(){
         this.counter = 0;
         this.customerList = {};
@@ -10,7 +8,7 @@ module.exports = class Discount {
     discountCounter(customer){
         this.counter += 1
         this.customerList[customer] = this.counter
-        if(this.customerList[customer] == 3) {
+        if(this.customerList[customer]  % 3 === 0) {
 
             return true
         }
@@ -18,3 +16,6 @@ module.exports = class Discount {
     }
 }
 
+const discount = new Discount();
+
+module.exports = discount;
