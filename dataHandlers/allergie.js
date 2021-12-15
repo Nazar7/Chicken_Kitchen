@@ -82,7 +82,7 @@ checkerAllergie(dishObject, warehouseStockObject, warehouseObject, restaurantBud
          return data
       }
       exist = false;
-       data = "seccess";
+       data = "success";
       //  console.log(data)
        return data
     }

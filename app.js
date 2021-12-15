@@ -71,7 +71,7 @@ const res =  async () => {
             case 'Buy' :
             case 'Table':
                 let buyResult = ACTIONS.loadBuyAction(dataList[i])
-console.log(buyResult)
+                console.log(buyResult)
                 actionResultsObjact.push(buyResult)
                 // actionResultsObjact.push(tableResult)
                 break;
@@ -81,7 +81,7 @@ console.log(buyResult)
                 break;
             case 'Budget' :
                 let budgetResult = ACTIONS.loadBudgetAction(dataList[i], skipReduceBudget)
-                restaurantBudget = budgetResult.restaurantBudget;
+                restaurantBudget = budgetResult.Budget;
                 actionResultsObjact.push(budgetResult)
                 break;
             case 'Audit' :
