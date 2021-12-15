@@ -1,5 +1,3 @@
-Buy, Alexandra Smith, Fries
-Buy, Alexandra Smith, Fries
-Buy, Alexandra Smith, Fries
-Buy, Alexandra Smith, Irish Fish
+Buy, Alexandra Smith, Emperor Chicken
+Buy, Bernard Unfortunate, Fries
 Audit, Resources

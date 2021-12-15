@@ -63,13 +63,13 @@ module.exports = class Action {
       let customerObject = new Customer(this.ParsedCustomerData, customer);
       let customerBudget = customerObject.loadCustomerBudget(this.actualCustomerBudget)
       let allergieObjact = new Allergie(dish, customer, dishObject.getBaseIngridientsOfDish(), customerObject.loadCustomerAllergieProduct());
-      let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
+      let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients);
       if (
           customerBudget > dishObject.loadDishPrice() &&
         allergieObjact.checkerAllergie(
             dishObject,
             this.warehouseStock,
-            new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish()),
+            new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients),
             this.restaurantBudget,
             this.allergiesWarehouseConfig) === "success"
       ) {
@@ -82,25 +82,28 @@ module.exports = class Action {
               individualCustomerOrderAmount = texsObjact.getTaxAndDiscountObjact().restaurantDiscoumt //dishObject.loadDishPrice() -
             }
         this.amountOfTableOrder += dishObject.loadDishPrice() + profitFromDish;
+        //Sofia 6.8.2
+        let messageAboutSpoiling;
+        messageAboutSpoiling = warehousObjact.reduceSpoilingFoodFromWarehouse(this.baseIngridients, this.warehouseStock, dish)
 
         let newRestaurantBudget = (this.restaurantBudget + dishPriceForCustomer) - texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax - individualCustomerOrderAmount;
         this.restaurantBudget = newRestaurantBudget;
         let restaurantProfit =  parseFloat((this.restaurantBudget - this.baseRestaurantBudget - collectedTax).toFixed(2))
-        this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock, this.baseIngridients);
+        this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock, this.baseIngridients)[0];
         collectedTax += texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
         if(data.arg.length > 1) {
           individualCustomerResult = customer + ", " + customerBudget + ", " + dish + ", " + Math.ceil(dishPriceForCustomer)
           tableAmountOrder += Math.ceil(dishPriceForCustomer)
           this.tableResult.push(individualCustomerResult)
         }
-        const command = `${data.action}, ${data.arg}, ${data.val} => ${customer}, ${customerBudget}, ${dish} => success, discount: ${individualCustomerOrderAmount}`
+        const command = `${data.action}, ${data.arg}, ${data.val} => ${customer}, ${customerBudget}, ${dish} => success, discount: ${individualCustomerOrderAmount}; ${messageAboutSpoiling ? messageAboutSpoiling : '' }`
         return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock} };
         // return this.resultObjact
       }
       else if (allergieObjact.checkerAllergie(
           dishObject,
           this.warehouseStock,
-          new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish()),
+          new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients),
           this.restaurantBudget,
           this.allergiesWarehouseConfig
       ) !== "success") {
@@ -123,7 +126,7 @@ module.exports = class Action {
         return this.buyActionResult.push(this.resultObjact);
       }
       // let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
-      this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock,  this.baseIngridients);
+      this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock,  this.baseIngridients)[0];
       if (item === data.arg.length - 1) {
 
         let resTableOrder = expectedData + " -> success; money amount: " + tableAmountOrder;
