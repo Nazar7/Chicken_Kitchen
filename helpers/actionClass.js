@@ -6,6 +6,9 @@ const discount = require("../dataHandlers/discount ");
 const Tax = require("../dataHandlers/tax");
 const spoilingService = require('../dataHandlers/spoilingService');
 const spoilRate = require('../data/spoilRate.json');
+const wasteLimit = require('../data/trashConfiguration.json');
+const trashService = require('../dataHandlers/trashService');
+const trash = trashService.getTrash();
 
 module.exports = class Action {
   constructor(
@@ -64,14 +67,17 @@ module.exports = class Action {
       let customerBudget = customerObject.loadCustomerBudget(this.actualCustomerBudget)
       let allergieObjact = new Allergie(dish, customer, dishObject.getBaseIngridientsOfDish(), customerObject.loadCustomerAllergieProduct());
       let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients);
+      let ifAllergy =  allergieObjact.checkerAllergie(
+          dishObject,
+          this.warehouseStock,
+          new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients),
+          this.restaurantBudget,
+          this.allergiesWarehouseConfig,
+          this.baseIngridients,
+          wasteLimit["waste limit"], trash)
       if (
           customerBudget > dishObject.loadDishPrice() &&
-        allergieObjact.checkerAllergie(
-            dishObject,
-            this.warehouseStock,
-            new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients),
-            this.restaurantBudget,
-            this.allergiesWarehouseConfig) === "success"
+          ifAllergy === "success"
       ) {
         let discountExist = discount.discountCounter(customer, this.profitandtaxobjact["every third discount"])
         let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"] / 100)
@@ -84,7 +90,7 @@ module.exports = class Action {
         this.amountOfTableOrder += dishObject.loadDishPrice() + profitFromDish;
         //Sofia 6.8.2
         let messageAboutSpoiling;
-        messageAboutSpoiling = warehousObjact.reduceSpoilingFoodFromWarehouse(this.baseIngridients, this.warehouseStock, dish)
+        messageAboutSpoiling = warehousObjact.reduceSpoilingFoodFromWarehouse(this.baseIngridients, this.warehouseStock, dish, spoilRate['spoil rate'], trash)
 
         let newRestaurantBudget = (this.restaurantBudget + dishPriceForCustomer) - texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax - individualCustomerOrderAmount;
         this.restaurantBudget = newRestaurantBudget;
@@ -97,16 +103,10 @@ module.exports = class Action {
           this.tableResult.push(individualCustomerResult)
         }
         const command = `${data.action}, ${data.arg}, ${data.val} => ${customer}, ${customerBudget}, ${dish} => success, discount: ${individualCustomerOrderAmount}; ${messageAboutSpoiling ? messageAboutSpoiling : '' }`
-        return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock} };
+        return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
         // return this.resultObjact
       }
-      else if (allergieObjact.checkerAllergie(
-          dishObject,
-          this.warehouseStock,
-          new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients),
-          this.restaurantBudget,
-          this.allergiesWarehouseConfig
-      ) !== "success") {
+      else if (ifAllergy !== "success") {
         let result = expectedData + " -> " + customerName + ", " + customerBudget + ', ' +
             dish + ", XXX -> can’t buy, allergic to " +
             customerObject.loadCustomerAllergieProduct();
@@ -116,7 +116,7 @@ module.exports = class Action {
         // Result.push(this.resultObjact);
         // return this.resultObjact
         const command = `${JSON.stringify(this.resultObjact.resultOfOrder)}`
-        return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock} };
+        return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
 
       }
       else if (customerBudget < dishObject.loadDishPrice()) {
@@ -151,7 +151,7 @@ module.exports = class Action {
     this.actualCustomerBudget = 0;
     // return this.resultObjact
     const command = `${data.action}, ${data.arg}, ${data.val} => ${this.resultObjact}`
-    return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock} };
+    return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
   }
 
   //Enzelt
@@ -278,9 +278,12 @@ module.exports = class Action {
           ingridientName, this.baseIngridients, this.parsedDishData, this.parsedIngridientsPricesData
       );
       const isBaseIngredient = dishService.isBaseIngredient(ingridientName);
-      // Sofia 6.8.2 (spoiling)
+      // Sofia 6.8.2 (spoiling)       // Sofia 6.8.3 (trash)
       if (isBaseIngredient) {
         spoilingAmount = spoilingService.checkAmountOfSpoiling(ingridientQuantity, spoilRate['spoil rate']);
+        if (spoilingAmount > 0) {
+          trashService.trashService(wasteLimit, trash, spoilingAmount, ingridientName)
+        }
       }
 
       //Enzelt 6.7.7 (check order config) //no, ingredients, dish, all
@@ -312,6 +315,19 @@ module.exports = class Action {
       }
       let expectedData = data.action + ", " + data.arg;
 
+      //Sofia 6.8.3
+      let dishObject = new Dish(
+          ingridientName,
+          this.baseIngridients,
+          this.parsedDishData,
+          this.parsedIngridientsPricesData
+      );
+      const baseIngredients = dishObject.getBaseIngridientsOfDish();
+      baseIngredients.forEach(ingredient => {
+        trashService.trashService(wasteLimit, trash, wastedData.wasted, ingredient)
+      });
+
+
       //Sofia fix
       let result = `${expectedData} => ${ingridientName}, ${item[1]} => Success: ${ingridientQuantity}, Wasted: ${wastedData.wasted}, Spoiling: ${spoilingAmount} \r\n`
       return result;
@@ -321,6 +337,7 @@ module.exports = class Action {
       Warehouse: {...this.warehouseStock},
       Budget: this.restaurantBudget,
       wastedData: wastedData,
+      trashCopy: {... trash}
     };
   }
 
@@ -335,7 +352,7 @@ module.exports = class Action {
       }
       //Sofia fix: add to audit
       const command = `${data.action}, ${data.arg}, ${data.val} => Budget: ${this.restaurantBudget}`
-      return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock} };
+      return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {... trash} };
   }
 
   loadAuditAction(data, actionResultsObjact) {
@@ -347,6 +364,7 @@ module.exports = class Action {
               "\n\r ===> command:" + element.command + "\n" +
               "Warehouse:" + JSON.stringify(element.Warehouse) + "\n" +
               "Budget:" + element.Budget + "\n" +
+              "Trash:" + JSON.stringify(element.trashCopy) + "\n" +
               '____________________________________________________________________________________________________________________^^________________'
           )
         });
@@ -354,6 +372,7 @@ module.exports = class Action {
             'INIT' + "\n" +
             "Warehouse: " +  JSON.stringify( this.baseWarehousStock) + "\n" +
             "Budget: " + this.baseRestaurantBudget + "\n" +
+            "Trash: " + "{}" + "\n" +
             "START" + "\n"
         )
         outputAuditList.push("\n AUDIT END")

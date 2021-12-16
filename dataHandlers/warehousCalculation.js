@@ -1,4 +1,6 @@
 const spoiling = require('./spoilingService');
+const trashService = require('./trashService');
+const wasteLimit = require('../data/trashConfiguration.json');
 
 module.exports = class WarehouseCalculation{
     constructor(order, getBaseIngridientsOfDish, parsedDishIngredients) {
@@ -11,7 +13,6 @@ module.exports = class WarehouseCalculation{
 
     //Sofia
     checkAllIngredients = (order, componentsOfFood, warehouse, baseIngredients) => {
-        // let ingredientsFromMenu = food[order];
         const ingredientsFromMenu = this.parsedDishIngredients[order];
 
         for ( let i = 0; i < ingredientsFromMenu.length; i++ ) {
@@ -30,16 +31,13 @@ module.exports = class WarehouseCalculation{
 
     warehousStockDecrease(warehouse, baseIngredients) {
         // this.order
-        const spoilRate = 10;
         const componentsOfFood = [];
           this.checkAllIngredients(this.order, componentsOfFood, warehouse, baseIngredients)
         if(this.order in warehouse && warehouse[this.order] > 0){
             warehouse[this.order] = warehouse[this.order]-1
           return warehouse
         } else {
-            // console.log(this.orderIngridients.join())
             for(let i = 0; i <= componentsOfFood.length; i++){
-                // console.log(this.orderIngridients[i] in this.warehouse)
                 if(componentsOfFood[i] in warehouse){
                     warehouse[componentsOfFood[i]] = warehouse[componentsOfFood[i]]-1
                 }
@@ -48,14 +46,12 @@ module.exports = class WarehouseCalculation{
         return  [warehouse, componentsOfFood]
     }
 
-    reduceSpoilingFoodFromWarehouse(baseIngredients, warehouse, order) {
+    reduceSpoilingFoodFromWarehouse(baseIngredients, warehouse, order, spoilRate, trash) {
         let message;
         let amountOfSpoiling = 0;
         let componentsOfFood;
         const parsedIngedients = baseIngredients[0].ingredients.split(',');
         componentsOfFood = this.warehousStockDecrease(warehouse, baseIngredients)[1];
-        const spoilRate = 10;
-        // componentsOfFood.length > 0 ? componentsOfFood : componentsOfFood.push(warehouse[order])
         if (!componentsOfFood) {
             const component = warehouse[order];
             const ingredientQuantity = this.getAmountFromWarehouse(warehouse, component)
@@ -63,6 +59,7 @@ module.exports = class WarehouseCalculation{
             if (amountOfSpoiling > 0) {
                 warehouse[component] = warehouse[component] - amountOfSpoiling
                 message = `${component} spoiled: ${amountOfSpoiling}; `;
+                trashService.trashService(wasteLimit["waste limit"], trash, amountOfSpoiling, component);
             }
         } else {
             componentsOfFood.forEach(component => {
@@ -72,6 +69,7 @@ module.exports = class WarehouseCalculation{
                     if (amountOfSpoiling > 0) {
                         warehouse[component] = warehouse[component] - amountOfSpoiling
                         message = `${component} spoiled: ${amountOfSpoiling}; `;
+                        trashService.trashService(wasteLimit["waste limit"], trash, amountOfSpoiling, component);
                     }
                 }
             })

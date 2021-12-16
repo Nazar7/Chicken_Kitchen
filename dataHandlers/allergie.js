@@ -1,4 +1,6 @@
 const WarehousCalculation = require("../dataHandlers/warehousCalculation.js");
+const trashService = require('./trashService');
+
 module.exports = class Allergie{
     constructor(dish, customer, getBaseIngridientsOfDish, loadCustomerAllergieProduct) {
         this.dish = dish;
@@ -7,9 +9,16 @@ module.exports = class Allergie{
         this.loadCustomerAllergieProduct = loadCustomerAllergieProduct;
       }
 
-    processAllergiesWarehouse(keep, dishObject, warehouseStockObject, warehouseObject, restaurantBudgetObject, data) {
+    processAllergiesWarehouse(keep, dishObject, warehouseStockObject, warehouseObject, restaurantBudgetObject, data, baseIngredients, wasteLimit, trash) {
         if (!keep) {
-            warehouseStockObject = warehouseObject.warehousStockDecrease(warehouseStockObject);
+            warehouseStockObject = warehouseObject.warehousStockDecrease(warehouseStockObject, baseIngredients);
+            //Sofia 6.8.3
+            const baseIngredientsOfDish = dishObject.getBaseIngridientsOfDish();
+            baseIngredientsOfDish.forEach(ingredient => {
+                trashService.trashService(wasteLimit, trash, 1, ingredient)
+            });
+
+
             data += '; Wasted due to configuration!';
         } else {
             let reduceMoney = '';
@@ -24,7 +33,7 @@ module.exports = class Allergie{
         return data;
     }
 
-checkerAllergie(dishObject, warehouseStockObject, warehouseObject, restaurantBudgetObject, allergiesWarehouseConfig) {
+checkerAllergie(dishObject, warehouseStockObject, warehouseObject, restaurantBudgetObject, allergiesWarehouseConfig, baseIngredients, wasteLimit, trash) {
     let data = "";
     let exist = false;
     let item = this.getBaseIngridientsOfDish
@@ -46,7 +55,9 @@ checkerAllergie(dishObject, warehouseStockObject, warehouseObject, restaurantBud
                       warehouseStockObject,
                       warehouseObject,
                       restaurantBudgetObject,
-                      data);
+                      data,
+                      item,
+                      wasteLimit, trash);
                   break;
               case 'keep':
                   data = this.processAllergiesWarehouse(
