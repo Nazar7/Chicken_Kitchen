@@ -9,9 +9,14 @@ Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","F
 Budget:515.2099999999999
 Trash:{}
 ____________________________________________________________________________________________________________________^^________________
- ===> command:Buy, Julie Mirage, Diamond Salad => Julie Mirage, 100, Diamond Salad => success, discount: 0; Tomatoes spoiled: 1; 
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":"1","Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":"5","Potatoes":"10","Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":1,"Pickles":2,"Feta":2,"Vinegar":"5","Rice":"5","Chocolate":"0"}
+ ===> command:Buy, Julie Mirage, Diamond Salad => Julie Mirage, 100, Diamond Salad => success, discount: 0; 
+Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":"1","Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":"5","Potatoes":"10","Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":2,"Pickles":2,"Feta":2,"Vinegar":"5","Rice":"5","Chocolate":"0"}
 Budget:530.4199999999998
-Trash:{"Tomatoes":1}
+Trash:{}
+____________________________________________________________________________________________________________________^^________________
+ ===> command:Buy, Julie Mirage, Diamond Salad => Julie Mirage, 100, Diamond Salad => success, discount: 1.69; Feta spoiled: 1; 
+Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":"1","Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":"5","Potatoes":"10","Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":1,"Pickles":1,"Feta":0,"Vinegar":"5","Rice":"5","Chocolate":"0"}
+Budget:543.9399999999997
+Trash:{"Feta":1}
 ____________________________________________________________________________________________________________________^^________________
  AUDIT END

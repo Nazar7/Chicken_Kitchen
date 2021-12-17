@@ -89,6 +89,11 @@ const res =  async () => {
                 resultAuditList.push(resultAudit)
                 console.log(resultAudit)
                 break;
+            case 'Throw trash away' :
+                // let resultAudit = ACTIONS.loadAuditAction(dataList[i], actionResultsObjact)
+                // resultAuditList.push(resultAudit)
+                console.log('Throw trash away')
+                break;
         }
     }
 console.log(actionResultsObjact)

@@ -91,11 +91,12 @@ module.exports = class Action {
         //Sofia 6.8.2
         let messageAboutSpoiling;
         messageAboutSpoiling = warehousObjact.reduceSpoilingFoodFromWarehouse(this.baseIngridients, this.warehouseStock, dish, spoilRate['spoil rate'], trash)
+        !messageAboutSpoiling ? this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock, this.baseIngridients)[0] : messageAboutSpoiling;
+
 
         let newRestaurantBudget = (this.restaurantBudget + dishPriceForCustomer) - texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax - individualCustomerOrderAmount;
         this.restaurantBudget = newRestaurantBudget;
         let restaurantProfit =  parseFloat((this.restaurantBudget - this.baseRestaurantBudget - collectedTax).toFixed(2))
-        this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock, this.baseIngridients)[0];
         collectedTax += texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
         if(data.arg.length > 1) {
           individualCustomerResult = customer + ", " + customerBudget + ", " + dish + ", " + Math.ceil(dishPriceForCustomer)
