@@ -2,4 +2,10 @@ Buy, Julie Mirage, Diamond Salad
 Buy, Julie Mirage, Diamond Salad
 Throw trash away
 Buy, Julie Mirage, Diamond Salad
+Buy, Julie Mirage, Fries
+Order, Fries, 4
+Throw trash away
+Order, Fries, 4
+Order, Fries, 4
+Throw trash away
 Audit, Resources

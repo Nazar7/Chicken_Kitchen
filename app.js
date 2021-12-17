@@ -84,15 +84,15 @@ const res =  async () => {
                 restaurantBudget = budgetResult.Budget;
                 actionResultsObjact.push(budgetResult)
                 break;
+            case 'Throw trash away' :
+                let resultThrowTrashAway = ACTIONS.loadThrowTrashAway(dataList[i])
+                actionResultsObjact.push(resultThrowTrashAway)
+                console.log('Throw trash away', resultThrowTrashAway)
+                break;
             case 'Audit' :
                 let resultAudit = ACTIONS.loadAuditAction(dataList[i], actionResultsObjact)
                 resultAuditList.push(resultAudit)
                 console.log(resultAudit)
-                break;
-            case 'Throw trash away' :
-                // let resultAudit = ACTIONS.loadAuditAction(dataList[i], actionResultsObjact)
-                // resultAuditList.push(resultAudit)
-                console.log('Throw trash away')
                 break;
         }
     }

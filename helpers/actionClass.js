@@ -8,6 +8,7 @@ const spoilingService = require('../dataHandlers/spoilingService');
 const spoilRate = require('../data/spoilRate.json');
 const wasteLimit = require('../data/trashConfiguration.json');
 const trashService = require('../dataHandlers/trashService');
+const dataWriter = require('../services/addDataToFile');
 const trash = trashService.getTrash();
 
 module.exports = class Action {
@@ -67,6 +68,8 @@ module.exports = class Action {
       let customerBudget = customerObject.loadCustomerBudget(this.actualCustomerBudget)
       let allergieObjact = new Allergie(dish, customer, dishObject.getBaseIngridientsOfDish(), customerObject.loadCustomerAllergieProduct());
       let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients);
+      const trash = trashService.getTrash();
+
       let ifAllergy =  allergieObjact.checkerAllergie(
           dishObject,
           this.warehouseStock,
@@ -103,6 +106,7 @@ module.exports = class Action {
           tableAmountOrder += Math.ceil(dishPriceForCustomer)
           this.tableResult.push(individualCustomerResult)
         }
+        // const trash = trashService.getTrash();
         const command = `${data.action}, ${data.arg}, ${data.val} => ${customer}, ${customerBudget}, ${dish} => success, discount: ${individualCustomerOrderAmount}; ${messageAboutSpoiling ? messageAboutSpoiling : '' }`
         return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
         // return this.resultObjact
@@ -117,6 +121,7 @@ module.exports = class Action {
         // Result.push(this.resultObjact);
         // return this.resultObjact
         const command = `${JSON.stringify(this.resultObjact.resultOfOrder)}`
+        const trash = trashService.getTrash();
         return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
 
       }
@@ -144,13 +149,15 @@ module.exports = class Action {
         };
         this.buyActionResult.push(this.resultObjact)
         // return this.resultObjact
+        const trash = trashService.getTrash();
         const command = `${JSON.stringify(this.resultObjact.resultOfOrder)}`
-        return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock} };
+        return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: { ... trash} };
       }
     }
     this.tableResult = []
     this.actualCustomerBudget = 0;
     // return this.resultObjact
+    const trash = trashService.getTrash();
     const command = `${data.action}, ${data.arg}, ${data.val} => ${this.resultObjact}`
     return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
   }
@@ -324,6 +331,8 @@ module.exports = class Action {
           this.parsedIngridientsPricesData
       );
       const baseIngredients = dishObject.getBaseIngridientsOfDish();
+      const trash = trashService.getTrash();
+
       baseIngredients.forEach(ingredient => {
         trashService.trashService(wasteLimit, trash, wastedData.wasted, ingredient)
       });
@@ -333,6 +342,7 @@ module.exports = class Action {
       let result = `${expectedData} => ${ingridientName}, ${item[1]} => Success: ${ingridientQuantity}, Wasted: ${wastedData.wasted}, Spoiling: ${spoilingAmount} \r\n`
       return result;
     });
+    const trash = trashService.getTrash();
     return {
       command: orderActionForEachArray,
       Warehouse: {...this.warehouseStock},
@@ -353,7 +363,23 @@ module.exports = class Action {
       }
       //Sofia fix: add to audit
       const command = `${data.action}, ${data.arg}, ${data.val} => Budget: ${this.restaurantBudget}`
-      return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {... trash} };
+    const trash = trashService.getTrash();
+    return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {... trash} };
+  }
+
+  //Sofia 684
+  loadThrowTrashAway(data) {
+    const wastePool = trashService.addToWastePool();
+
+
+    dataWriter.writeFile('./output/waste_pool.json', JSON.stringify(wastePool));
+
+    trashService.cleaner(); //очистити смітник
+    const trash = trashService.getTrash();
+
+    const command = `${data.action} => ${data.action}`
+
+    return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {... trash} };
   }
 
   loadAuditAction(data, actionResultsObjact) {
