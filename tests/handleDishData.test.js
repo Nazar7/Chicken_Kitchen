@@ -1,6 +1,6 @@
 const {
     getBaseIngredientsPrices,
-} = require('../dataHandlers/handleDishData');
+} = require('../dataHandlers/dishDataParser');
 
 describe("Test helpers getBaseIngredientsPrices", () => {
     const data = [

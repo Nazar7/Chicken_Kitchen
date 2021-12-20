@@ -1,6 +1,6 @@
 const {
     getBaseIngridientsOfOrder,
-} = require('../dataHandlers/handleOrderData');
+} = require('../dataHandlers/handleDishData');
 
 describe("Test handleOrderData getBaseIngridientsOfOrder", () => {
     const order = "Fries"

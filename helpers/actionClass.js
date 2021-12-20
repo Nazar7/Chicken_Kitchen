@@ -48,118 +48,129 @@ module.exports = class Action {
   }
 
   loadBuyAction(data) {
-    let individualCustomerResult
-    let expectedData = data.action + ", " + data.arg + ", " + data.val;
-    let collectedTax = 0
-    let tableAmountOrder = 0;
-    for (let item = 0; item <= data.arg.length - 1; item++) {
-      let individualCustomerOrderAmount = 0;
-      let dish = data.val[item];
-      let comand = data.action;
-      let customer = data.arg[item];
-      let customerName = data.arg[item].split(" ")[0];
-      let dishObject = new Dish(
-        dish,
-        this.baseIngridients,
-        this.parsedDishData,
-        this.parsedIngridientsPricesData
-      );
-      let customerObject = new Customer(this.ParsedCustomerData, customer);
-      let customerBudget = customerObject.loadCustomerBudget(this.actualCustomerBudget)
-      let allergieObjact = new Allergie(dish, customer, dishObject.getBaseIngridientsOfDish(), customerObject.loadCustomerAllergieProduct());
-      let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients);
-      const trash = trashService.getTrash();
+    const poisoned = trashService.getPoisoned();
+    if (!poisoned) {
+      let individualCustomerResult
+      let expectedData = data.action + ", " + data.arg + ", " + data.val;
+      let collectedTax = 0
+      let tableAmountOrder = 0;
+      for (let item = 0; item <= data.arg.length - 1; item++) {
+        let individualCustomerOrderAmount = 0;
+        let dish = data.val[item];
+        let comand = data.action;
+        let customer = data.arg[item];
+        let customerName = data.arg[item].split(" ")[0];
+        let dishObject = new Dish(
+            dish,
+            this.baseIngridients,
+            this.parsedDishData,
+            this.parsedIngridientsPricesData
+        );
+        let customerObject = new Customer(this.ParsedCustomerData, customer);
+        let customerBudget = customerObject.loadCustomerBudget(this.actualCustomerBudget)
+        let allergieObjact = new Allergie(dish, customer, dishObject.getBaseIngridientsOfDish(), customerObject.loadCustomerAllergieProduct());
+        let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients);
+        const trash = trashService.getTrash();
 
-      let ifAllergy =  allergieObjact.checkerAllergie(
-          dishObject,
-          this.warehouseStock,
-          new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients),
-          this.restaurantBudget,
-          this.allergiesWarehouseConfig,
-          this.baseIngridients,
-          wasteLimit["waste limit"], trash)
-      if (
-          customerBudget > dishObject.loadDishPrice() &&
-          ifAllergy === "success"
-      ) {
-        let discountExist = discount.discountCounter(customer, this.profitandtaxobjact["every third discount"])
-        let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"] / 100)
-        let dishPriceForCustomer = profitFromDish + dishObject.loadDishPrice() - individualCustomerOrderAmount;
-        let texsObjact = new Tax(this.profitandtaxobjact["every third discount"], this.profitandtaxobjact["transaction tax"], dishPriceForCustomer)
-        //Sofia fix
-        if(discountExist) {
-              individualCustomerOrderAmount = texsObjact.getTaxAndDiscountObjact().restaurantDiscoumt //dishObject.loadDishPrice() -
-            }
-        this.amountOfTableOrder += dishObject.loadDishPrice() + profitFromDish;
-        //Sofia 6.8.2
-        let messageAboutSpoiling;
-        messageAboutSpoiling = warehousObjact.reduceSpoilingFoodFromWarehouse(this.baseIngridients, this.warehouseStock, dish, spoilRate['spoil rate'], trash)
-        !messageAboutSpoiling ? this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock, this.baseIngridients)[0] : messageAboutSpoiling;
+        let ifAllergy =  allergieObjact.checkerAllergie(
+            dishObject,
+            this.warehouseStock,
+            new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish(), dishObject.parsedDishIngredients),
+            this.restaurantBudget,
+            this.allergiesWarehouseConfig,
+            this.baseIngridients,
+            wasteLimit["waste limit"], trash)
+        if (
+            customerBudget > dishObject.loadDishPrice() &&
+            ifAllergy === "success"
+        ) {
+          let discountExist = discount.discountCounter(customer, this.profitandtaxobjact["every third discount"])
+          let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"] / 100)
+          let dishPriceForCustomer = profitFromDish + dishObject.loadDishPrice() - individualCustomerOrderAmount;
+          let texsObjact = new Tax(this.profitandtaxobjact["every third discount"], this.profitandtaxobjact["transaction tax"], dishPriceForCustomer)
+          //Sofia fix
+          if(discountExist) {
+            individualCustomerOrderAmount = texsObjact.getTaxAndDiscountObjact().restaurantDiscoumt //dishObject.loadDishPrice() -
+          }
+          this.amountOfTableOrder += dishObject.loadDishPrice() + profitFromDish;
+          //Sofia 6.8.2
+          let messageAboutSpoiling;
+          messageAboutSpoiling = warehousObjact.reduceSpoilingFoodFromWarehouse(this.baseIngridients, this.warehouseStock, dish, spoilRate['spoil rate'], trash)
+          !messageAboutSpoiling ? this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock, this.baseIngridients)[0] : messageAboutSpoiling;
 
 
-        let newRestaurantBudget = (this.restaurantBudget + dishPriceForCustomer) - texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax - individualCustomerOrderAmount;
-        this.restaurantBudget = newRestaurantBudget;
-        let restaurantProfit =  parseFloat((this.restaurantBudget - this.baseRestaurantBudget - collectedTax).toFixed(2))
-        collectedTax += texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
-        if(data.arg.length > 1) {
-          individualCustomerResult = customer + ", " + customerBudget + ", " + dish + ", " + Math.ceil(dishPriceForCustomer)
-          tableAmountOrder += Math.ceil(dishPriceForCustomer)
-          this.tableResult.push(individualCustomerResult)
+          let newRestaurantBudget = (this.restaurantBudget + dishPriceForCustomer) - texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax - individualCustomerOrderAmount;
+          this.restaurantBudget = newRestaurantBudget;
+          let restaurantProfit =  parseFloat((this.restaurantBudget - this.baseRestaurantBudget - collectedTax).toFixed(2))
+          collectedTax += texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
+          if(data.arg.length > 1) {
+            individualCustomerResult = customer + ", " + customerBudget + ", " + dish + ", " + Math.ceil(dishPriceForCustomer)
+            tableAmountOrder += Math.ceil(dishPriceForCustomer)
+            this.tableResult.push(individualCustomerResult)
+          }
+          // const trash = trashService.getTrash();
+          const command = `${data.action}, ${data.arg}, ${data.val} => ${customer}, ${customerBudget}, ${dish} => success, discount: ${individualCustomerOrderAmount}; ${messageAboutSpoiling ? messageAboutSpoiling : '' }`
+          return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
+          // return this.resultObjact
         }
-        // const trash = trashService.getTrash();
-        const command = `${data.action}, ${data.arg}, ${data.val} => ${customer}, ${customerBudget}, ${dish} => success, discount: ${individualCustomerOrderAmount}; ${messageAboutSpoiling ? messageAboutSpoiling : '' }`
-        return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
-        // return this.resultObjact
-      }
-      else if (ifAllergy !== "success") {
-        let result = expectedData + " -> " + customerName + ", " + customerBudget + ', ' +
-            dish + ", XXX -> can’t buy, allergic to " +
-            customerObject.loadCustomerAllergieProduct();
+        else if (ifAllergy !== "success") {
+          let result = expectedData + " -> " + customerName + ", " + customerBudget + ', ' +
+              dish + ", XXX -> can’t buy, allergic to " +
+              customerObject.loadCustomerAllergieProduct();
 
-        this.resultObjact = { resultOfOrder: result }
-        // return this.buyAction
-        // Result.push(this.resultObjact);
-        // return this.resultObjact
-        const command = `${JSON.stringify(this.resultObjact.resultOfOrder)}`
-        const trash = trashService.getTrash();
-        return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
+          this.resultObjact = { resultOfOrder: result }
+          // return this.buyAction
+          // Result.push(this.resultObjact);
+          // return this.resultObjact
+          const command = `${JSON.stringify(this.resultObjact.resultOfOrder)}`
+          const trash = trashService.getTrash();
+          return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
 
-      }
-      else if (customerBudget < dishObject.loadDishPrice()) {
-        let result = expectedData + " -> " + customerName + ", " + customerBudget + dish + ", " +
-            dishObject.loadDishPrice() + " -> can’t buy, cannot afford it.";
-        this.resultObjact = { resultOfOrder: result }
-        return this.buyActionResult.push(this.resultObjact);
-      }
-      // let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
-      this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock,  this.baseIngridients)[0];
-      if (item === data.arg.length - 1) {
+        }
+        else if (customerBudget < dishObject.loadDishPrice()) {
+          let result = expectedData + " -> " + customerName + ", " + customerBudget + dish + ", " +
+              dishObject.loadDishPrice() + " -> can’t buy, cannot afford it.";
+          this.resultObjact = { resultOfOrder: result }
+          return this.buyActionResult.push(this.resultObjact);
+        }
+        // let warehousObjact = new WarehousCalculation(dish,dishObject.getBaseIngridientsOfDish());
+        this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock,  this.baseIngridients)[0];
+        if (item === data.arg.length - 1) {
 
-        let resTableOrder = expectedData + " -> success; money amount: " + tableAmountOrder;
-        let resultSinglCustomer = expectedData + " -> " + customerName + ', ' +
-            customerBudget+ ', ' +  dish + ', ' + (comand === 'Table') ? resTableOrder :
-            dishObject.loadDishPrice() + ' -> ' + 'success, discount: ' + individualCustomerOrderAmount
-        // this.actualCustomerBudget = customerBudget - dishObject.loadDishPrice();
-        this.resultObjact = {
-          resultOfTable: (data.arg.length > 1) ? this.tableResult : '',
-          resultOfOrder: (!resTableOrder) ? resTableOrder : resultSinglCustomer,
-          command: comand,
-          Warehouse: {...this.warehouseStock},
-          Budget: this.restaurantBudget,
-        };
-        this.buyActionResult.push(this.resultObjact)
-        // return this.resultObjact
-        const trash = trashService.getTrash();
-        const command = `${JSON.stringify(this.resultObjact.resultOfOrder)}`
-        return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: { ... trash} };
+          let resTableOrder = expectedData + " -> success; money amount: " + tableAmountOrder;
+          let resultSinglCustomer = expectedData + " -> " + customerName + ', ' +
+          customerBudget+ ', ' +  dish + ', ' + (comand === 'Table') ? resTableOrder :
+              dishObject.loadDishPrice() + ' -> ' + 'success, discount: ' + individualCustomerOrderAmount
+          // this.actualCustomerBudget = customerBudget - dishObject.loadDishPrice();
+          this.resultObjact = {
+            resultOfTable: (data.arg.length > 1) ? this.tableResult : '',
+            resultOfOrder: (!resTableOrder) ? resTableOrder : resultSinglCustomer,
+            command: comand,
+            Warehouse: {...this.warehouseStock},
+            Budget: this.restaurantBudget,
+          };
+          this.buyActionResult.push(this.resultObjact)
+          // return this.resultObjact
+          const trash = trashService.getTrash();
+          const command = `${JSON.stringify(this.resultObjact.resultOfOrder)}`
+          return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: { ... trash} };
+        }
       }
+      this.tableResult = []
+      this.actualCustomerBudget = 0;
+      // return this.resultObjact
+      const trash = trashService.getTrash();
+      const command = `${data.action}, ${data.arg}, ${data.val} => ${this.resultObjact}`
+      return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
     }
-    this.tableResult = []
-    this.actualCustomerBudget = 0;
-    // return this.resultObjact
-    const trash = trashService.getTrash();
-    const command = `${data.action}, ${data.arg}, ${data.val} => ${this.resultObjact}`
-    return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
+    else {
+      return {
+        command: `${data.action}, ${data.arg}, ${data.val} => Restaurant Poisoned`,
+        Warehouse: {...this.warehouseStock},
+        Budget: this.restaurantBudget,
+        trashCopy: {... trash}
+      };
+    }
   }
 
   //Enzelt
@@ -274,82 +285,92 @@ module.exports = class Action {
   }
 
   loadOrderAction(data) {
-    let ordersList = [data.action, data.arg];
-    let orderConfigData = {};
-    let wastedData = {};
-    ordersList.shift();
-    const orderActionForEachArray = ordersList[0].map((item) => {
-      let ingridientName = item[0];
-      let ingridientQuantity = item[1];
-      let spoilingAmount = 0;
-      const dishService = new Dish(
-          ingridientName, this.baseIngridients, this.parsedDishData, this.parsedIngridientsPricesData
-      );
-      const isBaseIngredient = dishService.isBaseIngredient(ingridientName);
-      // Sofia 6.8.2 (spoiling)       // Sofia 6.8.3 (trash)
-      if (isBaseIngredient) {
-        spoilingAmount = spoilingService.checkAmountOfSpoiling(ingridientQuantity, spoilRate['spoil rate']);
-        if (spoilingAmount > 0) {
-          trashService.trashService(wasteLimit, trash, spoilingAmount, ingridientName)
+    const poisoned = trashService.getPoisoned();
+    if (!poisoned) {
+      let ordersList = [data.action, data.arg];
+      let orderConfigData = {};
+      let wastedData = {};
+      ordersList.shift();
+      const orderActionForEachArray = ordersList[0].map((item) => {
+        let ingridientName = item[0];
+        let ingridientQuantity = item[1];
+        let spoilingAmount = 0;
+        const dishService = new Dish(
+            ingridientName, this.baseIngridients, this.parsedDishData, this.parsedIngridientsPricesData
+        );
+        const isBaseIngredient = dishService.isBaseIngredient(ingridientName);
+        // Sofia 6.8.2 (spoiling)       // Sofia 6.8.3 (trash)
+        if (isBaseIngredient) {
+          spoilingAmount = spoilingService.checkAmountOfSpoiling(ingridientQuantity, spoilRate['spoil rate']);
+          if (spoilingAmount > 0) {
+            trashService.trashService(wasteLimit, trashService.getTrash(), spoilingAmount, ingridientName)
+          }
         }
-      }
 
-      //Enzelt 6.7.7 (check order config) //no, ingredients, dish, all
-      orderConfigData = this.checkOrderConfig(ingridientName, ingridientQuantity);
-      ingridientQuantity = orderConfigData.canOrder;
-      //Enzelt 6.7.4
-      wastedData = this.checkWarehouseConfig(ingridientName, ingridientQuantity);
-      //Sofia fix
-      ingridientQuantity = ingridientQuantity <= wastedData.canOrder ? ingridientQuantity - spoilingAmount : wastedData.canOrder - spoilingAmount;
-      //Sofia fix price
-      let ingridientPrice
-      if (isBaseIngredient) {
-        ingridientPrice = this.parsedIngridientsPricesData.parsedIngridientsPrices()[ingridientName]
-      }  else {
-        ingridientPrice = dishService.loadDishPrice();
-      }
-      // Sofia 6.8.2: add spoilingAmount
-      let costOfOrderedIngredient = (ingridientQuantity + spoilingAmount) * ingridientPrice;
-      if(!this.profitandtaxobjact["transaction tax"]){
-        let restaurantTransactionTax
-        return restaurantTransactionTax = costOfOrderedIngredient * (100 + 10) / 100
-      }
-      let restaurantTransactionTax  = costOfOrderedIngredient * (this.profitandtaxobjact["transaction tax"] / 100)
-      this.restaurantBudget = this.restaurantBudget - (costOfOrderedIngredient + restaurantTransactionTax)
-      if(this.warehouseStock[ingridientName] === undefined){
-        this.warehouseStock[ingridientName] = ingridientQuantity
-      } else {
-        this.warehouseStock[ingridientName] = +this.warehouseStock[ingridientName] + +ingridientQuantity;
-      }
-      let expectedData = data.action + ", " + data.arg;
+        //Enzelt 6.7.7 (check order config) //no, ingredients, dish, all
+        orderConfigData = this.checkOrderConfig(ingridientName, ingridientQuantity);
+        ingridientQuantity = orderConfigData.canOrder;
+        //Enzelt 6.7.4
+        wastedData = this.checkWarehouseConfig(ingridientName, ingridientQuantity);
+        //Sofia fix
+        ingridientQuantity = ingridientQuantity <= wastedData.canOrder ? ingridientQuantity - spoilingAmount : wastedData.canOrder - spoilingAmount;
+        //Sofia fix price
+        let ingridientPrice
+        if (isBaseIngredient) {
+          ingridientPrice = this.parsedIngridientsPricesData.parsedIngridientsPrices()[ingridientName]
+        }  else {
+          ingridientPrice = dishService.loadDishPrice();
+        }
+        // Sofia 6.8.2: add spoilingAmount
+        let costOfOrderedIngredient = (ingridientQuantity + spoilingAmount) * ingridientPrice;
+        if(!this.profitandtaxobjact["transaction tax"]){
+          let restaurantTransactionTax
+          return restaurantTransactionTax = costOfOrderedIngredient * (100 + 10) / 100
+        }
+        let restaurantTransactionTax  = costOfOrderedIngredient * (this.profitandtaxobjact["transaction tax"] / 100)
+        this.restaurantBudget = this.restaurantBudget - (costOfOrderedIngredient + restaurantTransactionTax)
+        if(this.warehouseStock[ingridientName] === undefined){
+          this.warehouseStock[ingridientName] = ingridientQuantity
+        } else {
+          this.warehouseStock[ingridientName] = +this.warehouseStock[ingridientName] + +ingridientQuantity;
+        }
+        let expectedData = data.action + ", " + data.arg;
 
-      //Sofia 6.8.3
-      let dishObject = new Dish(
-          ingridientName,
-          this.baseIngridients,
-          this.parsedDishData,
-          this.parsedIngridientsPricesData
-      );
-      const baseIngredients = dishObject.getBaseIngridientsOfDish();
-      const trash = trashService.getTrash();
+        //Sofia 6.8.3
+        let dishObject = new Dish(
+            ingridientName,
+            this.baseIngridients,
+            this.parsedDishData,
+            this.parsedIngridientsPricesData
+        );
+        const baseIngredients = dishObject.getBaseIngridientsOfDish();
+        const trash = trashService.getTrash();
 
-      baseIngredients.forEach(ingredient => {
-        trashService.trashService(wasteLimit, trash, wastedData.wasted, ingredient)
+        baseIngredients.forEach(ingredient => {
+          trashService.trashService(wasteLimit, trash, wastedData.wasted, ingredient)
+        });
+
+
+        //Sofia fix
+        let result = `${expectedData} => ${ingridientName}, ${item[1]} => Success: ${ingridientQuantity}, Wasted: ${wastedData.wasted}, Spoiling: ${spoilingAmount} \r\n`
+        return result;
       });
-
-
-      //Sofia fix
-      let result = `${expectedData} => ${ingridientName}, ${item[1]} => Success: ${ingridientQuantity}, Wasted: ${wastedData.wasted}, Spoiling: ${spoilingAmount} \r\n`
-      return result;
-    });
-    const trash = trashService.getTrash();
-    return {
-      command: orderActionForEachArray,
-      Warehouse: {...this.warehouseStock},
-      Budget: this.restaurantBudget,
-      wastedData: wastedData,
-      trashCopy: {... trash}
-    };
+      const trash = trashService.getTrash();
+      return {
+        command: orderActionForEachArray,
+        Warehouse: {...this.warehouseStock},
+        Budget: this.restaurantBudget,
+        wastedData: wastedData,
+        trashCopy: {... trash}
+      };
+    } else {
+      return {
+        command: `${data.action}, ${data.arg}, ${data.val} => Restaurant Poisoned`,
+        Warehouse: {...this.warehouseStock},
+        Budget: this.restaurantBudget,
+        trashCopy: {... trash}
+      };
+    }
   }
 
   loadBudgetAction(data, skipReduce = false) {

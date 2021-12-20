@@ -1,11 +1,10 @@
 Buy, Julie Mirage, Diamond Salad
 Buy, Julie Mirage, Diamond Salad
-Throw trash away
 Buy, Julie Mirage, Diamond Salad
+Budget, +, 1000
+Order, Tuna, 34
 Buy, Julie Mirage, Fries
-Order, Fries, 4
 Throw trash away
-Order, Fries, 4
-Order, Fries, 4
+Order, Tuna, 1
 Throw trash away
 Audit, Resources
