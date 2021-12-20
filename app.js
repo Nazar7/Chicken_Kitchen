@@ -8,6 +8,9 @@ const IngridientsPricesDataParse = require('./dataHandlers/ingridientsPricesPars
 const DishDataParse = require('./dataHandlers/dishDataParser.js')
 const CustomerDataParse = require('./dataHandlers/customersDataParser.js')
 const Action  = require("./helpers/actionClass")
+const trashService = require('./dataHandlers/trashService');
+
+const wasteLimit = require('./data/trashConfiguration.json');
 
 const res =  async () => {
     const datasFromFiles = await resultHandleDatas()
@@ -62,7 +65,10 @@ const res =  async () => {
             let message = "RESTAURANT BANKRUPT";
             const res = { message, restaurantBudget: restaurantBudget, warehousStock: warehouseStock};
             actionResultsObjact.push(res)
+            const trash = trashService.getTrash();
+            trashService.checkIsPoisoned(trash, wasteLimit['waste limit'])
             continue;
+
         }
         let skipReduceBudget = true;
 
@@ -83,6 +89,11 @@ const res =  async () => {
                 let budgetResult = ACTIONS.loadBudgetAction(dataList[i], skipReduceBudget)
                 restaurantBudget = budgetResult.Budget;
                 actionResultsObjact.push(budgetResult)
+                break;
+            case 'Throw trash away' :
+                let resultThrowTrashAway = ACTIONS.loadThrowTrashAway(dataList[i])
+                actionResultsObjact.push(resultThrowTrashAway)
+                console.log('Throw trash away', resultThrowTrashAway)
                 break;
             case 'Audit' :
                 let resultAudit = ACTIONS.loadAuditAction(dataList[i], actionResultsObjact)

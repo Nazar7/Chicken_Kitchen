@@ -2,7 +2,7 @@ const {
     getCustomersBudgets,
     getCustomerAllergieProduct,
     checkAllergiExist
-} = require('../dataHandlers/handleCustomersData');
+} = require('../dataHandlers/handleCustomersDataClass');
 
 describe("Test handle customers budgets data - getCustomersBudgets", () => {
     const data = [

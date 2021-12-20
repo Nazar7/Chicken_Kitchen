@@ -36,13 +36,13 @@ class TrashService {
     }
     addToTrash = (ingredient, wastedQuantity) => {
         if (!!this.trash[ingredient]) {
-            this.trash[`${ingredient}`] = this.trash[ingredient] + parseInt(wastedQuantity);
+            this.trash[`${ingredient}`] = parseInt(this.trash[ingredient]) + parseInt(wastedQuantity);
         } else {
             this.trash[`${ingredient}`] = wastedQuantity;
         }
     }
     cleaner = () => {
-        this.trash = {}; //очищує смітник
+        this.trash = {};
     }
     addToWastePool = () => {
         !Object.keys(this.wastePool).length ? this.wastePool = { ...this.wastePool, ... this.trash } :
@@ -51,9 +51,9 @@ class TrashService {
                     return el === key;
                 });
                 if (foundItem) {
-                    this.wastePool[el] += this.trash[el]; //якщо поля однакові: сумуємо показники
+                    this.wastePool[el] += parseInt(this.trash[el]);
                 } else {
-                    this.wastePool[el] = this.trash[el]; //поле не існує: записуємо поле
+                    this.wastePool[el] = this.trash[el];
                 }
             });
         return this.wastePool;
