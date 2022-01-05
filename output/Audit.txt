@@ -1,54 +1,0 @@
-INIT
-Warehouse: {"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":"1","Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":"1","Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":"5","Potatoes":"10","Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":"5","Pickles":"5","Feta":"5","Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget: 500
-Trash: {}
-START
-
- ===> command:Buy, Julie Mirage, Diamond Salad => Julie Mirage, 100, Diamond Salad => success, discount: 0; 
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":"1","Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":"5","Potatoes":"10","Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":4,"Pickles":4,"Feta":4,"Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget:515.2099999999999
-Trash:{}
-____________________________________________________________________________________________________________________^^________________
- ===> command:Buy, Julie Mirage, Diamond Salad => Julie Mirage, 100, Diamond Salad => success, discount: 0; Feta spoiled: 1; 
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":"1","Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":"5","Potatoes":"10","Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":3,"Pickles":3,"Feta":2,"Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget:530.4199999999998
-Trash:{"Feta":1}
-____________________________________________________________________________________________________________________^^________________
- ===> command:Buy, Julie Mirage, Diamond Salad => Julie Mirage, 100, Diamond Salad => success, discount: 1.69; 
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":"1","Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":"5","Potatoes":"10","Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":1,"Pickles":1,"Feta":0,"Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget:543.9399999999997
-Trash:{"Feta":1}
-____________________________________________________________________________________________________________________^^________________
- ===> command:Budget, +, 1000 => Budget: 1543.9399999999996
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":"1","Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":"5","Potatoes":"10","Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":1,"Pickles":1,"Feta":0,"Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget:1543.9399999999996
-Trash:{"Feta":1}
-____________________________________________________________________________________________________________________^^________________
- ===> command:Order, Tuna,34 => Tuna, 34 => Success: 2, Wasted: 29, Spoiling: 3 
-
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":"1","Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":7,"Potatoes":"10","Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":1,"Pickles":1,"Feta":0,"Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget:1406.4399999999996
-Trash:{"Feta":1,"Tuna":32}
-____________________________________________________________________________________________________________________^^________________
- ===> command:Buy, Julie Mirage, Fries => Julie Mirage, 100, Fries => success, discount: 0; 
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":0,"Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":7,"Potatoes":9,"Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":1,"Pickles":1,"Feta":0,"Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget:1409.9499999999996
-Trash:{"Feta":1,"Tuna":32}
-____________________________________________________________________________________________________________________^^________________
- ===> command:Throw trash away => Throw trash away
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":0,"Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":7,"Potatoes":9,"Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":1,"Pickles":1,"Feta":0,"Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget:1409.9499999999996
-Trash:{}
-____________________________________________________________________________________________________________________^^________________
- ===> command:Order, Tuna,1 => Tuna, 1 => Success: 1, Wasted: 0, Spoiling: 0 
-
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":0,"Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":8,"Potatoes":9,"Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":1,"Pickles":1,"Feta":0,"Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget:1382.4499999999996
-Trash:{"Tuna":0}
-____________________________________________________________________________________________________________________^^________________
- ===> command:Throw trash away => Throw trash away
-Warehouse:{"Princess Chicken":"0","Fat Cat Chicken":"0","Emperor Chicken":"1","Fries":0,"Youth Sauce":"1","Spicy Sauce":"0","Omega Sauce":"1","Diamond Salad":0,"Ruby Salad":"1","Smashed Potatoes":"1","Tuna Cake":"1","Fish In Water":"1","Irish Fish":"1","Chicken":"5","Tuna":8,"Potatoes":9,"Asparagus":"5","Milk":"1","Honey":"5","Paprika":"5","Garlic":"5","Water":"5","Lemon":"5","Tomatoes":1,"Pickles":1,"Feta":0,"Vinegar":"5","Rice":"5","Chocolate":"0"}
-Budget:1382.4499999999996
-Trash:{}
-____________________________________________________________________________________________________________________^^________________
- AUDIT END

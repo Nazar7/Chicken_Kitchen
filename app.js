@@ -12,6 +12,7 @@ const trashService = require('./dataHandlers/trashService');
 
 const wasteLimit = require('./data/trashConfiguration.json');
 
+
 const res =  async () => {
     const datasFromFiles = await resultHandleDatas()
 

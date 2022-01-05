@@ -10,6 +10,8 @@ const wasteLimit = require('../data/trashConfiguration.json');
 const trashService = require('../dataHandlers/trashService');
 const dataWriter = require('../services/addDataToFile');
 const trash = trashService.getTrash();
+const tipsService = require('../dataHandlers/tips')
+const tips = tipsService.getTipsValue()
 
 module.exports = class Action {
   constructor(
@@ -88,6 +90,8 @@ module.exports = class Action {
           let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"] / 100)
           let dishPriceForCustomer = profitFromDish + dishObject.loadDishPrice() - individualCustomerOrderAmount;
           let texsObjact = new Tax(this.profitandtaxobjact["every third discount"], this.profitandtaxobjact["transaction tax"], dishPriceForCustomer)
+          let tipAmount =  tipsService.getTipsValue()
+          console.log(" tipAmount - " + tipAmount)
           //Sofia fix
           if(discountExist) {
             individualCustomerOrderAmount = texsObjact.getTaxAndDiscountObjact().restaurantDiscoumt //dishObject.loadDishPrice() -
@@ -283,6 +287,7 @@ module.exports = class Action {
     }
     return orderConfigData;
   }
+
 
   loadOrderAction(data) {
     const poisoned = trashService.getPoisoned();
