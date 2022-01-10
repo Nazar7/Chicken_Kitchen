@@ -12,6 +12,8 @@ const dataWriter = require('../services/addDataToFile');
 const trash = trashService.getTrash();
 const tipsService = require('../dataHandlers/tips')
 const tips = tipsService.getTipsValue()
+const volatilityAmount = require('../dataHandlers/volatility')
+const volatility = volatilityAmount.randomVolatilityData()
 
 module.exports = class Action {
   constructor(
@@ -47,6 +49,7 @@ module.exports = class Action {
     this.allergiesWarehouseConfig = ALLERGIES_WAREHOUSE_CONFIG;
     this.orderConfig = ORDER_CONFIG;
     //*******
+    this.tipAmount = 0;
   }
 
   loadBuyAction(data) {
@@ -89,22 +92,45 @@ module.exports = class Action {
           let discountExist = discount.discountCounter(customer, this.profitandtaxobjact["every third discount"])
           let profitFromDish = dishObject.loadDishPrice() * (this.profitandtaxobjact["profit margin"] / 100)
           let dishPriceForCustomer = profitFromDish + dishObject.loadDishPrice() - individualCustomerOrderAmount;
+
           let texsObjact = new Tax(this.profitandtaxobjact["every third discount"], this.profitandtaxobjact["transaction tax"], dishPriceForCustomer)
-          let tipAmount =  tipsService.getTipsValue()
-          console.log(" tipAmount - " + tipAmount)
+
+          let tip = Math.ceil(tipsService.getTipsValue())
+          console.log("tip - " + tip)
+
+          if((customerBudget - dishPriceForCustomer) < (dishPriceForCustomer * (tip/100))){
+           this.tipAmount = Math.ceil(customerBudget - dishPriceForCustomer)
+          } else {
+            this.tipAmount = Math.ceil(dishPriceForCustomer * (tip/100))
+          }
+
+          console.log("tipAmount - " + this.tipAmount)
+
+          console.log("dishPriceForCustomer - " + dishPriceForCustomer)
+          console.log("profitFromDish - " + profitFromDish)
+          console.log("dishObject.loadDishPrice() - " + dishObject.loadDishPrice())
+          console.log("individualCustomerOrderAmount - " + individualCustomerOrderAmount)
+
+          console.log("________________")
+
           //Sofia fix
           if(discountExist) {
             individualCustomerOrderAmount = texsObjact.getTaxAndDiscountObjact().restaurantDiscoumt //dishObject.loadDishPrice() -
           }
           this.amountOfTableOrder += dishObject.loadDishPrice() + profitFromDish;
+
           //Sofia 6.8.2
           let messageAboutSpoiling;
-          messageAboutSpoiling = warehousObjact.reduceSpoilingFoodFromWarehouse(this.baseIngridients, this.warehouseStock, dish, spoilRate['spoil rate'], trash)
-          !messageAboutSpoiling ? this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock, this.baseIngridients)[0] : messageAboutSpoiling;
-
-
+          // console.log(this.baseIngridients)
+          // console.log(this.warehouseStock)
+          // console.log(dish)
+          // console.log(trash)
+          // messageAboutSpoiling = warehousObjact.reduceSpoilingFoodFromWarehouse(this.baseIngridients, this.warehouseStock, dish, spoilRate['spoil rate'], trash)
+          // !messageAboutSpoiling ? this.warehouseStock = warehousObjact.warehousStockDecrease(this.warehouseStock, this.baseIngridients)[0] : messageAboutSpoiling;
+          // console.log(messageAboutSpoiling + " - messageAboutSpoiling")
           let newRestaurantBudget = (this.restaurantBudget + dishPriceForCustomer) - texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax - individualCustomerOrderAmount;
           this.restaurantBudget = newRestaurantBudget;
+          console.log("this.restaurantBudget - " +  this.restaurantBudget)
           let restaurantProfit =  parseFloat((this.restaurantBudget - this.baseRestaurantBudget - collectedTax).toFixed(2))
           collectedTax += texsObjact.getTaxAndDiscountObjact().restaurantTransactionTax;
           if(data.arg.length > 1) {
@@ -114,7 +140,12 @@ module.exports = class Action {
           }
           // const trash = trashService.getTrash();
           const command = `${data.action}, ${data.arg}, ${data.val} => ${customer}, ${customerBudget}, ${dish} => success, discount: ${individualCustomerOrderAmount}; ${messageAboutSpoiling ? messageAboutSpoiling : '' }`
-          return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
+          return {
+            Budget: this.restaurantBudget,
+            command,
+            Warehouse: {...this.warehouseStock},
+            trashCopy: {...trash},
+            tips: this.tipAmount };
           // return this.resultObjact
         }
         else if (ifAllergy !== "success") {
@@ -128,7 +159,12 @@ module.exports = class Action {
           // return this.resultObjact
           const command = `${JSON.stringify(this.resultObjact.resultOfOrder)}`
           const trash = trashService.getTrash();
-          return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
+          return {
+            Budget: this.restaurantBudget,
+            command,
+            Warehouse: {...this.warehouseStock},
+            trashCopy: {...trash},
+            tips: this.tipAmount};
 
         }
         else if (customerBudget < dishObject.loadDishPrice()) {
@@ -157,7 +193,12 @@ module.exports = class Action {
           // return this.resultObjact
           const trash = trashService.getTrash();
           const command = `${JSON.stringify(this.resultObjact.resultOfOrder)}`
-          return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: { ... trash} };
+          return {
+            Budget: this.restaurantBudget,
+            command,
+            Warehouse: {...this.warehouseStock},
+            trashCopy: { ... trash},
+            tips: this.tipAmount };
         }
       }
       this.tableResult = []
@@ -165,14 +206,20 @@ module.exports = class Action {
       // return this.resultObjact
       const trash = trashService.getTrash();
       const command = `${data.action}, ${data.arg}, ${data.val} => ${this.resultObjact}`
-      return { Budget: this.restaurantBudget, command, Warehouse: {...this.warehouseStock}, trashCopy: {...trash} };
+      return {
+        Budget: this.restaurantBudget,
+        command,
+        Warehouse: {...this.warehouseStock},
+        trashCopy: {...trash},
+        tips: this.tipAmount };
     }
     else {
       return {
         command: `${data.action}, ${data.arg}, ${data.val} => Restaurant Poisoned`,
         Warehouse: {...this.warehouseStock},
         Budget: this.restaurantBudget,
-        trashCopy: {... trash}
+        trashCopy: {... trash},
+        tips: this.tipAmount
       };
     }
   }
@@ -304,8 +351,10 @@ module.exports = class Action {
             ingridientName, this.baseIngridients, this.parsedDishData, this.parsedIngridientsPricesData
         );
         const isBaseIngredient = dishService.isBaseIngredient(ingridientName);
+
         // Sofia 6.8.2 (spoiling)       // Sofia 6.8.3 (trash)
         if (isBaseIngredient) {
+          // console.log("isBaseIngredient - " + isBaseIngredient)
           spoilingAmount = spoilingService.checkAmountOfSpoiling(ingridientQuantity, spoilRate['spoil rate']);
           if (spoilingAmount > 0) {
             trashService.trashService(wasteLimit, trashService.getTrash(), spoilingAmount, ingridientName)
@@ -317,8 +366,9 @@ module.exports = class Action {
         ingridientQuantity = orderConfigData.canOrder;
         //Enzelt 6.7.4
         wastedData = this.checkWarehouseConfig(ingridientName, ingridientQuantity);
+        console.log(wastedData)
         //Sofia fix
-        ingridientQuantity = ingridientQuantity <= wastedData.canOrder ? ingridientQuantity - spoilingAmount : wastedData.canOrder - spoilingAmount;
+        // ingridientQuantity = ingridientQuantity <= wastedData.canOrder ? ingridientQuantity - spoilingAmount : wastedData.canOrder - spoilingAmount;
         //Sofia fix price
         let ingridientPrice
         if (isBaseIngredient) {
@@ -327,13 +377,25 @@ module.exports = class Action {
           ingridientPrice = dishService.loadDishPrice();
         }
         // Sofia 6.8.2: add spoilingAmount
-        let costOfOrderedIngredient = (ingridientQuantity + spoilingAmount) * ingridientPrice;
+        let costOfOrderedIngredient = (parseInt(ingridientQuantity) + parseInt(spoilingAmount)) * ingridientPrice;
+        console.log(costOfOrderedIngredient)
         if(!this.profitandtaxobjact["transaction tax"]){
           let restaurantTransactionTax
           return restaurantTransactionTax = costOfOrderedIngredient * (100 + 10) / 100
         }
         let restaurantTransactionTax  = costOfOrderedIngredient * (this.profitandtaxobjact["transaction tax"] / 100)
-        this.restaurantBudget = this.restaurantBudget - (costOfOrderedIngredient + restaurantTransactionTax)
+
+        // console.log(this.restaurantBudget)
+        // console.log(costOfOrderedIngredient)
+        console.log(volatility + " - volatility")
+        let volatilityValue
+        isBaseIngredient ? volatilityValue = volatility[0] : volatilityValue = volatility[1]
+        console.log(volatilityValue)
+        let orderCost = (costOfOrderedIngredient + restaurantTransactionTax) * volatilityValue
+        console.log(orderCost)
+        this.restaurantBudget = this.restaurantBudget - orderCost
+        console.log(this.restaurantBudget)
+
         if(this.warehouseStock[ingridientName] === undefined){
           this.warehouseStock[ingridientName] = ingridientQuantity
         } else {

@@ -13,17 +13,25 @@ module.exports = class WarehouseCalculation{
 
     //Sofia
     checkAllIngredients = (order, componentsOfFood, warehouse, baseIngredients) => {
-        const ingredientsFromMenu = this.parsedDishIngredients[order];
+        let ingredientsFromMenu = this.parsedDishIngredients[order];
+        // ingredientsFromMenu = ['Potatoes']
+        // let ingredientsFromMenu
+        // !ingredientsFromMenu ? ingredientsFromMenu = order : ingredientsFromMenu = this.parsedDishIngredients[order]
 
-        for ( let i = 0; i < ingredientsFromMenu.length; i++ ) {
-            const checkExistsOfIng = baseIngredients.some(item => warehouse[ingredientsFromMenu[i]] > 0 || ingredientsFromMenu[i] === item);
-            if (checkExistsOfIng) {
-                componentsOfFood.push(ingredientsFromMenu[i]);
-            } else {
-                this.checkAllIngredients(ingredientsFromMenu[i], componentsOfFood, warehouse, baseIngredients)
+            // console.log(this.parsedDishIngredients)
+            // console.log(this.parsedDishIngredients[order])
+            // console.log(order)
+            // console.log(this.parsedDishIngredients["Fries"])
+            for (let i = 0; i < ingredientsFromMenu.length; i++) {
+                const checkExistsOfIng = baseIngredients.some(item => warehouse[ingredientsFromMenu[i]] > 0 || ingredientsFromMenu[i] === item);
+                if (checkExistsOfIng) {
+                    componentsOfFood.push(ingredientsFromMenu[i]);
+                } else {
+                    this.checkAllIngredients(ingredientsFromMenu[i], componentsOfFood, warehouse, baseIngredients)
+                }
             }
         }
-    }
+
 
     getAmountFromWarehouse = (warehouses, ingredient) => {
         return warehouses[ingredient];
@@ -51,7 +59,9 @@ module.exports = class WarehouseCalculation{
         let amountOfSpoiling = 0;
         let componentsOfFood;
         const parsedIngedients = baseIngredients[0].ingredients.split(',');
+
         componentsOfFood = this.warehousStockDecrease(warehouse, baseIngredients)[1];
+        console.log(componentsOfFood + " - !!!!!!!!!!!!!!!!!!")
         if (!componentsOfFood) {
             const component = warehouse[order];
             const ingredientQuantity = this.getAmountFromWarehouse(warehouse, component)
